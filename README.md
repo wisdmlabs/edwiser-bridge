@@ -1,4 +1,5 @@
 === Edwiser Bridge - WordPress Moodle LMS Integration ===
+
 Contributors: WisdmLabs
 Tags: WordPress, Moodle, Courses, Users, Synchronization, Sell Courses, Learning Management System, LMS, LMS Integration, Moodle WordPress, WordPress Moodle, WP Moodle,
 Requires at least: 4.0
