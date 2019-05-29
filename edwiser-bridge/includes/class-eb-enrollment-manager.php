@@ -95,11 +95,13 @@ class EBEnrollmentManager
      *
      * @return bool true / false
      */
-    public function updateUserCourseEnrollment($args, $roleId = "5")
+    public function updateUserCourseEnrollment($args)
     {
+        //global $wpdb;
+        // default args
         $defaults = array(
             'user_id' => 0,
-            'role_id' => $roleId,
+            'role_id' => 5,
             'courses' => array(),
             'unenroll' => 0,
             'suspend' => 0,
@@ -109,6 +111,7 @@ class EBEnrollmentManager
          * Parse incoming $args into an array and merge it with $defaults.
          */
         $args = wp_parse_args($args, $defaults);
+
         // get moodle user id of user
         $moodle_user_id = get_user_meta($args['user_id'], 'moodle_user_id', true);
         $msg = '';
@@ -230,13 +233,13 @@ class EBEnrollmentManager
      *
      * @return bool true
      */
-    public function updateEnrollmentRecordWordpress($args, $roleId = "5")
+    public function updateEnrollmentRecordWordpress($args)
     {
         global $wpdb;
         // default args
         $defaults = array(
             'user_id' => 0,
-            'role_id' => $roleId,
+            'role_id' => 5,
             'courses' => array(),
             'unenroll' => 0,
             'suspend' => 0,
@@ -321,11 +324,8 @@ class EBEnrollmentManager
         );
 
         if ($deleted) {
-            $user = get_userdata($user_id);
+            $user = get_user_by('id', $user_id);
             $args = array(
-                'username' =>$user->user_login,
-                'first_name' =>$user->user_firstname,
-                'last_name' =>$user->user_lastname,
                 'user_email' => $user->user_email,
                 'course_id' => $course_id,
             );

@@ -135,7 +135,7 @@ class EbShortcodeUserProfile
                 if (count($errors)) {
                     $_SESSION['eb_msgs_'.$user->ID] = '<p class="eb-error">' . implode("<br />", $errors) . '</p>';
                 } else {
-                    // Profile updated on Moodle successfully.
+                    // Profile updated on Moodle sucessfully.
                     if (self::updateMoodleProfile($posted_data)) {
                         self::updateWordPressProfile($posted_data);
 

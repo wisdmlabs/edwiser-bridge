@@ -98,8 +98,7 @@ class EbShortcodeMyCourses
                 'post_type' => 'eb_course',
                 'post_status' => 'publish',
                 'post__in' => $my_courses,
-                'ignore_sticky_posts' => true,
-                'posts_per_page' => -1
+                'ignore_sticky_posts' => true
             );
 
             $courses = new \WP_Query($args);

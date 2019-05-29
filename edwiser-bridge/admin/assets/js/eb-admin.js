@@ -29,47 +29,34 @@
      */
 
     $(window).load(function () {
-        if ($("#eb_email_templates_list").length) {
-            var container = $("#eb_email_templates_list");
-            var scrollTo = $(".eb-emailtmpl-active");
-            console.log("Scrollling......................");
-            container.animate({
-                scrollTop: scrollTo.offset().top - container.offset().top + container.scrollTop()
-            });
-        }
-        /**
-         * Add the ajax processing icon
-         * @type String
-         */
-        var login = '<div id="eb-lading-parent" class="eb-lading-parent-wrap"><div class="eb-loader-progsessing-anim"></div></div>';
-        $("body").append(login);
 
-        $('.colorpick').iris({
+// Color picker
+        jQuery('.colorpick').iris({
             change: function (event, ui) {
-                $(this).css({backgroundColor: ui.color.toString()});
+                jQuery(this).css({backgroundColor: ui.color.toString()});
             },
             hide: true,
             border: true
         }).each(function () {
-            $(this).css({backgroundColor: jQuery(this).val()});
+            jQuery(this).css({backgroundColor: jQuery(this).val()});
         })
                 .click(function () {
-                    $('.iris-picker').hide();
-                    $(this).closest('.color_box, td').find('.iris-picker').show();
+                    jQuery('.iris-picker').hide();
+                    jQuery(this).closest('.color_box, td').find('.iris-picker').show();
                 });
-        $('body').click(function () {
-            $('.iris-picker').hide();
+        jQuery('body').click(function () {
+            jQuery('.iris-picker').hide();
         });
-        $('.color_box, .colorpick').click(function (event) {
+        jQuery('.color_box, .colorpick').click(function (event) {
             event.stopPropagation();
         });
         // Edit prompt
-        $(function () {
+        jQuery(function () {
             var changed = false;
-            $('input, textarea, select, checkbox').change(function () {
+            jQuery('input, textarea, select, checkbox').change(function () {
                 changed = true;
             });
-            $('.eb-nav-tab-wrapper a').click(function () {
+            jQuery('.eb-nav-tab-wrapper a').click(function () {
                 if (changed) {
                     window.onbeforeunload = function () {
                         var flag = true;
@@ -90,61 +77,8 @@
                     window.onbeforeunload = '';
                 }
             });
-            $('.submit input').click(function () {
+            jQuery('.submit input').click(function () {
                 window.onbeforeunload = '';
-            });
-            $('.eb-unenrol').click(function (e) {
-                var userId = jQuery(this).data('user-id');
-                var recordId = jQuery(this).data('record-id');
-                var courseId = jQuery(this).data('course-id');
-                var row = jQuery(this).parents('tr');
-                $("#eb-lading-parent").show();
-                $.ajax({
-                    method: "post",
-                    url: eb_admin_js_object.ajaxurl,
-                    dataType: "json",
-                    data: {
-                        'action': 'wdm_eb_user_manage_unenroll_unenroll_user',
-                        'user_id': userId,
-                        'course_id': courseId,
-                    },
-                    success: function (response) {
-                        $('.load-response').hide();
-                        var message = "";
-                        if (response['success'] == true) {
-                            var msg = response['data'];
-                            message = "<div class='notice notice-success is-dismissible'>"
-                                    + "<p><strong>" + msg + "</strong></p>"
-                                    + "<button type='button' class='notice-dismiss'>"
-                                    + "<span class='screen-reader-text'>Dismiss this notice</span>"
-                                    + "</button>"
-                                    + "</div>";
-                            jQuery(row).css('background-color', '#d7cad2');
-                            jQuery(row).fadeOut(2000, function () { });
-
-                        } else {
-                            var msg = response['data'];
-                            message = "<div class='notice notice-error is-dismissible'>"
-                                    + "<p><strong>" + msg + "</strong></p>"
-                                    + "<button type='button' class='notice-dismiss'>"
-                                    + "<span class='screen-reader-text'>Dismiss this notice</span>"
-                                    + "</button>"
-                                    + "</div>";
-                        }
-                        $("#eb-notices").empty();
-                        $("#eb-notices").append(message);
-                        $("#eb-lading-parent").hide();
-                    },
-                    error: function (error) {
-                        var html = "<div class='notice notice-error is-dismissible'>"
-                                + "<p><strong>Error unenrolling student</strong></p>"
-                                + "<button type='button' class='notice-dismiss'>"
-                                + "<span class='screen-reader-text'>Dismiss this notice</span>"
-                                + "</button>"
-                                + "</div>";
-                        $("#eb-lading-parent").hide();
-                    }
-                });
             });
         });
         //help tip
@@ -154,10 +88,10 @@
             'fadeOut': 50,
             'delay': 200
         };
-        $(".tips, .help_tip, .help-tip").tipTip(tiptip_args);
+        jQuery(".tips, .help_tip, .help-tip").tipTip(tiptip_args);
         // Add tiptip to parent element for widefat tables
-        $(".parent-tips").each(function () {
-            $(this).closest('a, th').attr('data-tip', jQuery(this).data('tip')).tipTip(tiptip_args).css('cursor', 'help');
+        jQuery(".parent-tips").each(function () {
+            jQuery(this).closest('a, th').attr('data-tip', jQuery(this).data('tip')).tipTip(tiptip_args).css('cursor', 'help');
         });
         /**
          * == OhSnap!.js ==
@@ -404,19 +338,20 @@
             e.preventDefault();
             var tmplId = this.id;
             var name = $(this).text();
-            $("#current_selected_email_tmpl_key").val(tmplId);
             setGetParameter("curr_tmpl", tmplId);
-            $("#eb-lading-parent").show();
-            getTamplateContent(tmplId, name);
-            $(document).on("click", ".notice-dismiss", function () {
-                $("#eb-notices").empty();
+            $.ajax({
+                type: "post",
+                url: ajaxurl,
+                data: {action: "wdm_eb_get_email_template", tmpl_name: tmplId},
+                error: function (error) {
+                    alert(eb_admin_js_object.msg_tpl_not_found);
+                },
+                success: function (response) {
+                    setTemplateData(response, name, tmplId);
+                    $(".eb-emailtmpl-list-item").removeClass("eb-emailtmpl-active");
+                    $("#" + tmplId).addClass("eb-emailtmpl-active");
+                }
             });
-//            $(".notice-dismiss").click(function () {
-//                $("#eb-notices").empty();
-//            });
-        });
-        $(document).on("click", ".notice-dismiss", function () {
-            $("#eb-notices").empty();
         });
         $("#eb_send_test_email").click(function (e) {
             e.preventDefault();
@@ -426,7 +361,6 @@
             var subject = $("#eb_email_subject").val();
             var security = $("#eb_send_testmail_sec_filed").val();
             var message = tinyMCE.get("eb_emailtmpl_editor").getContent();
-            $("#eb-lading-parent").show();
             $.ajax({
                 type: "post",
                 url: ajaxurl,
@@ -434,101 +368,70 @@
                 error: function (error) {
                     $('.load-response').hide();
                     ohSnap('<p>' + eb_admin_js_object.msg_mail_delivery_fail + '</p>', 'error');
-                    $("#eb-lading-parent").hide();
                 },
                 success: function (response) {
-                    if (response['success']) {                        
-                        if (response["data"] == "OK") {
-                            ohSnap('<p>' + eb_admin_js_object.msg_test_mail_sent_to + mailTo + '</p>', 'success');
-                        } else {
-                            ohSnap('<p>' + eb_admin_js_object.msg_mail_delivery_fail + '</p>', 'error');
-                        }
-                    }else{
-                      ohSnap('<p>' + eb_admin_js_object.msg_mail_delivery_fail + '</p>', 'error');  
-                    }
+                    response = $.parseJSON(response);
+                    console.log(response["success"]);
                     $('.load-response').hide();
-                    $("#eb-lading-parent").hide();
-                }
-            });
-        });
-
-        $("#eb_email_reset_template").click(function (e) {
-            e.preventDefault();
-            var tmplName = $("#current_selected_email_tmpl_key").val();
-            var tmplSub = $("#current-tmpl-name").val();
-            console.log(tmplName);
-            $("#eb-lading-parent").show();
-            $.ajax({
-                type: "post",
-                url: ajaxurl,
-                data: {
-                    action: "wdm_eb_email_tmpl_restore_content",
-                    tmpl_name: tmplName,
-                },
-                error: function (error) {
-                    $("#eb-lading-parent").hide();
-                },
-                success: function (response) {
-                    if (response["success"] == true) {
-                        getTamplateContent(tmplName, tmplSub);
+                    if (response["success"] == "1") {
+                        ohSnap('<p>' + eb_admin_js_object.msg_test_mail_sent_to + mailTo + '</p>', 'success');
                     } else {
-                        alert("Template is identical, did not restore.");
+                        ohSnap('<p>' + eb_admin_js_object.msg_mail_delivery_fail + '</p>', 'error');
                     }
-                    $("#eb-lading-parent").hide();
                 }
             });
         });
 
 
-
-        $(".link-unlink").click(function (e) {
+         $(".link-unlink").click(function (e) {
             e.preventDefault();
-            var userid = $(this).parent().attr("id");
-            var linkuser = $(this).attr("id");
+            var userid=$(this).parent().attr("id");
+            var linkuser=$(this).attr("id");
             /*var currDiv=$(this);*/
-            linkuser = linkuser.substr(linkuser.indexOf("-") + 1);
-            var str = linkuser;
-            linkuser = 0;
-            if (str == "link") {
-                linkuser = 1;
+            linkuser=linkuser.substr(linkuser.indexOf("-")+1);
+            var str=linkuser;
+            linkuser=0;
+            if(str == "link"){
+                linkuser=1;
                 var strCheck = "unlink";
             } else {
-                var strCheck = "link";
+                var strCheck ="link";
             }
-            $("#moodleLinkUnlinkUserNotices").css("display", "none");
-            $("#eb-lading-parent").show();
+            $("#moodleLinkUnlinkUserNotices").css("display","none");
+            jQuery("body").css("cursor", "progress");
+
             $.ajax({
                 type: "post",
                 url: ajaxurl,
-                data: {action: "moodleLinkUnlinkUser", user_id: userid, link_user: linkuser},
+                data: {action: "moodleLinkUnlinkUser", user_id: userid, link_user:linkuser },
                 error: function (error) {
-                    $("#moodleLinkUnlinkUserNotices").css("display", "block");
+                    $("#moodleLinkUnlinkUserNotices").css("display","block");
                     $("#moodleLinkUnlinkUserNotices").removeClass("updated");
                     $("#moodleLinkUnlinkUserNotices").addClass("notice notice-error");
-                    if (str == "link")
-                    {
-                        $("#moodleLinkUnlinkUserNotices").children().html(result["msg"]);
-                    } else {
-                        $("#moodleLinkUnlinkUserNotices").children().html(result["msg"]);
-                    }
-                    $("#eb-lading-parent").hide();
+                    if(str == "link")
+                        {
+                            $("#moodleLinkUnlinkUserNotices").children().html(result["msg"]);
+                        } else {
+                            $("#moodleLinkUnlinkUserNotices").children().html(result["msg"]);
+                        }
+                        jQuery("body").css("cursor", "auto");
                 },
                 success: function (response) {
-                    var result = $.parseJSON(response);
-                    if (result["code"] == ("success")) {
+                    var result=$.parseJSON(response);
+                    if(result["code"] == ("success")){
                         $("#moodleLinkUnlinkUserNotices").addClass("updated");
-                        $("#moodleLinkUnlinkUserNotices").css("display", "block");
+                        $("#moodleLinkUnlinkUserNotices").css("display","block");
                         $("#moodleLinkUnlinkUserNotices").children().html(result['msg']);
-                        $("#" + userid + "-" + str).css("display", "none");
-                        $("#" + userid + "-" + strCheck).css("display", "block");
+                        $("#"+userid+"-"+str).css("display","none");
+                        $("#"+userid+"-"+strCheck).css("display","block");
                     } else {
-                        $("#moodleLinkUnlinkUserNotices").css("display", "block");
+                        $("#moodleLinkUnlinkUserNotices").css("display","block");
                         $("#moodleLinkUnlinkUserNotices").removeClass("updated");
                         $("#moodleLinkUnlinkUserNotices").addClass("notice notice-error");
-                        if (response.includes("LinkError")) {
+                        if(response.includes("LinkError")){
                             $("#moodleLinkUnlinkUserNotices").children().html(response["msg"]);
                         } else {
-                            if (str == "link")
+                            if(str == "link")
                             {
                                 $("#moodleLinkUnlinkUserNotices").children().html(eb_admin_js_object.msg_error_link_user);
                             } else {
@@ -536,7 +439,7 @@
                             }
                         }
                     }
-                    $("#eb-lading-parent").hide();
+                    jQuery("body").css("cursor", "auto");
                 }
             });
 
@@ -544,31 +447,6 @@
 
     });
 
-    $(document).one("click", ".notice-dismiss", function () {
-        $("#eb-notices").empty();
-    });
-
-    function getTamplateContent(tmplId, name) {
-        $.ajax({
-            type: "post",
-            url: ajaxurl,
-            data: {
-                action: "wdm_eb_get_email_template",
-                tmpl_name: tmplId
-            },
-            error: function (error) {
-                alert(eb_admin_js_object.msg_tpl_not_found);
-                $("#eb-lading-parent").hide();
-            },
-            success: function (response) {
-                setTemplateData(response, name, tmplId);
-                $(".eb-emailtmpl-list-item").removeClass("eb-emailtmpl-active");
-                $("#" + tmplId).addClass("eb-emailtmpl-active");
-                $("#eb-lading-parent").hide();
-                $("#current-tmpl-name").val(response['subject']);
-            }
-        });
-    }
     function ohSnap(text, type)
     {
         var container = $('.response-box');
@@ -592,16 +470,11 @@
             $("#eb_email_from").val(response['from_email']);
             $("#eb_email_from_name").val(response['from_name']);
             $("#eb_email_subject").val(response['subject']);
-            if (response['notify_allow'] == "ON") {
-                $("#eb_email_notification_on").attr('checked', true)
-            } else {
-                $("#eb_email_notification_on").attr('checked', false)
-            }
             $("#eb_emailtmpl_name").val(tmplId);
             if (tinyMCE.activeEditor == null) {
-                jQuery("#eb_emailtmpl_editor").html(response['content']);
+               jQuery("#eb_emailtmpl_editor").html(response['content']);
             } else {
-                tinyMCE.get("eb_emailtmpl_editor").setContent(response['content']);
+               tinyMCE.get("eb_emailtmpl_editor").setContent(response['content']);
             }
         } catch (e) {
             alert(eb_admin_js_object.msg_err_parsing_res);

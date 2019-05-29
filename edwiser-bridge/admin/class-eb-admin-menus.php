@@ -33,7 +33,6 @@ class EbAdminMenus
         add_action('admin_menu', array($this, 'adminMenu'), 9);
         add_action('admin_menu', array($this, 'settingsMenu'), 10);
         add_action('admin_menu', array($this, 'emailTemplate'), 10);
-        add_action('admin_menu', array($this, 'manageEnrollmentMenu'), 10);
         add_action('admin_menu', array($this, 'extensionsMenu'), 10);
         add_action('admin_menu', array($this, 'helpMenu'), 10);
         add_action('parent_file', array($this, 'addMenuPageTaxonomyFix'), 10);
@@ -111,22 +110,21 @@ class EbAdminMenus
         // Set the submenu as active/current while anywhere in Custom Post Type ( courses, orders )
         if ($current_screen->post_type == 'eb_course' || $current_screen->post_type == 'eb_order') {
             if ($pagenow == 'post.php') {
-                $submenu_file = 'edit.php?post_type=' . $current_screen->post_type;
+                $submenu_file = 'edit.php?post_type='.$current_screen->post_type;
             }
 
             if ($pagenow == 'edit-tags.php') {
-                $submenu_file = 'edit-tags.php?taxonomy=eb_course_cat&post_type=' . $current_screen->post_type;
+                $submenu_file = 'edit-tags.php?taxonomy=eb_course_cat&post_type='.$current_screen->post_type;
             }
             $parent_file = 'edwiserbridge_lms';
         }
         return $parent_file;
     }
 
-
     /**
      * Add settings submenu item
      *
-     * @since 1.1.0
+     * @since 1.0.0
      */
     public function settingsMenu()
     {
@@ -137,23 +135,6 @@ class EbAdminMenus
             'manage_options',
             'eb-settings',
             array($this, 'settingsPage')
-        );
-    }
-
-    /**
-     * Add submenu `Manage Enrollment` to manage user enrollment under EB.
-     *
-     * @since 1.2.2
-     */
-    public function manageEnrollmentMenu()
-    {
-        add_submenu_page(
-            'edwiserbridge_lms',
-            __('User Enrollment', 'eb-textdomain'),
-            __('Manage Enrollment', 'eb-textdomain'),
-            'manage_options',
-            'mucp-manage-enrollment',
-            array($this, 'manageEnrollmentContent')
         );
     }
 
@@ -234,18 +215,6 @@ class EbAdminMenus
     }
 
     /**
-     * Render Enrollment  manager page content.
-     *
-     * @since 1.2.2
-     */
-    public function manageEnrollmentContent()
-    {
-        $edwiser=EdwiserBridge::instance();
-        $enrollmentManager=new EBManageUserEnrollment($edwiser->getPluginName(), $edwiser->getVersion());
-        $enrollmentManager->outPut();
-    }
-
-    /**
      * Initialize the extensions page
      */
     public function extensionsPage()
@@ -259,4 +228,5 @@ class EbAdminMenus
         $emailTmpl->outPut();
     }
 }
+
 return new EbAdminMenus();
