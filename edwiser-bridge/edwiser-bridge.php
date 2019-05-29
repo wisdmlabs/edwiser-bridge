@@ -32,14 +32,12 @@ if (!defined('WPINC')) {
  * The code that runs during plugin activation.
  * This action is documented in includes/class-eb-activator.php.
  */
-function activateEdwiserBridge($netWide)
+function activateEdwiserBridge()
 {
     require_once plugin_dir_path(__FILE__).'includes/class-eb-activator.php';
-    EBActivator::activate($netWide);
+    EBActivator::activate();
 }
 register_activation_hook(__FILE__, 'app\wisdmlabs\edwiserBridge\activateEdwiserBridge');
-
-
 
 /**
  * The code that runs during plugin deactivation.
