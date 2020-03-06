@@ -2,7 +2,7 @@
 Contributors: WisdmLabs
 Tags: Moodle, Courses, eLearning, WordPress Moodle, LMS, Users, Synchronization, Sell Courses, Learning Management System, LMS Integration, Moodle WordPress, WP Moodle,
 Requires at least: 4.0
-Tested up to: 4.9.5
+Tested up to: 5.0.2
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -169,7 +169,7 @@ Take a look at the link below and follow the steps provided to configure your Mo
 No, not required. Both the systems can be installed on the same server or different servers.
 
  = Which course details are imported on synchronizing courses from Moodle to WordPress? = 
-When courses are imported from Moodle the course title, description and feature image are imported to WordPress.
+When courses are imported from Moodle the course title and course description are imported to WordPress.
 
  = Can one WordPress website be used with multiple Moodle websites? = 
 No, this is not possible using Edwiser Bridge.
@@ -178,6 +178,14 @@ Take a look at the link below to see the full list of questions which will help 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
  ==  Changelog  ==
+
+= 1.3.4 =
+* Feature - Added option to add link for the redirection from eb-my-courses page if user is not enrolled in any course.
+* Feature - Functionality  to disable and customize recommended courses section in eb-my-courses page.
+* Feature - Added option to add and customize recommended courses for the single course page.
+
+
+
 = 1.3.3 =
 * Feature - Added optional terms and conditions on user account page depending on the backend setting.
 * Tweak- Added user meta data related to the edwiser-bridge while exporting the users data.
