@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Edwiser Bridge - WordPress Moodle LMS Integration\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-12 04:55+0000\n"
+"POT-Creation-Date: 2017-11-27 11:33+0000\n"
 "POT-Revision-Date: Thu Jan 19 2017 11:11:01 GMT+0530 (IST)\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: \n"
@@ -354,13 +354,13 @@ msgstr ""
 msgid "%s draft updated. <a href=\"%s\" target=\"_blank\">Preview %s</a>"
 msgstr ""
 
-#: includes/eb-core-functions.php:246
+#: includes/eb-core-functions.php:229
 #: includes/class-eb-email-template-parser.php:89
 #: admin/settings/class-eb-settings-general.php:85
 msgid "My Courses"
 msgstr ""
 
-#: includes/eb-core-functions.php:247
+#: includes/eb-core-functions.php:230
 #: public/shortcodes/class-eb-shortcode-my-courses.php:42
 msgid "Recommended Courses"
 msgstr ""
@@ -496,8 +496,8 @@ msgid "click here"
 msgstr ""
 
 #: includes/class-eb-email-template-parser.php:114
-#: public/shortcodes/class-eb-shortcode-my-courses.php:90
-#: public/shortcodes/class-eb-shortcode-my-courses.php:123
+#: public/shortcodes/class-eb-shortcode-my-courses.php:91
+#: public/shortcodes/class-eb-shortcode-my-courses.php:124
 msgid "Click here"
 msgstr ""
 
@@ -612,7 +612,7 @@ msgstr ""
 
 #: includes/class-eb-user-manager.php:899
 #: public/templates/account/user-profile.php:40
-#: public/templates/account/user-account.php:44
+#: public/templates/account/user-account.php:40
 msgid "Enrolled Courses"
 msgstr ""
 
@@ -824,33 +824,33 @@ msgstr ""
 msgid "Sorry, unable to link to moodle"
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:73
+#: admin/class-eb-admin-settings.php:74
 msgid "Action failed. Please refresh the page and retry."
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:81
+#: admin/class-eb-admin-settings.php:82
 msgid "Your settings have been saved."
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:563
+#: admin/class-eb-admin-settings.php:564
 #: admin/settings/class-eb-settings-general.php:92
 #: admin/settings/class-eb-settings-general.php:123
 msgid "Select a page"
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:596
+#: admin/class-eb-admin-settings.php:597
 msgid "- Select a sidebar -"
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:634
+#: admin/class-eb-admin-settings.php:635
 msgid "2"
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:635
+#: admin/class-eb-admin-settings.php:636
 msgid "3"
 msgstr ""
 
-#: admin/class-eb-admin-settings.php:636
+#: admin/class-eb-admin-settings.php:637
 msgid "4"
 msgstr ""
 
@@ -1163,96 +1163,96 @@ msgstr ""
 msgid "%s does not exist."
 msgstr ""
 
-#: public/class-eb-public.php:126
+#: public/class-eb-public.php:134
 msgid "- Select Country -"
 msgstr ""
 
-#: public/class-eb-public.php:143
+#: public/class-eb-public.php:151
 msgid "The field 'First Name' cannot be left blank"
 msgstr ""
 
-#: public/class-eb-public.php:144
+#: public/class-eb-public.php:152
 msgid "The field 'Last Name' cannot be left blank"
 msgstr ""
 
-#: public/class-eb-public.php:145
+#: public/class-eb-public.php:153
 msgid "The field 'Email' cannot be left blank"
 msgstr ""
 
-#: public/class-eb-public.php:146
+#: public/class-eb-public.php:154
 msgid "Problems in processing your order, Please try later."
 msgstr ""
 
-#: public/class-eb-public.php:147 public/class-eb-public.php:162
+#: public/class-eb-public.php:155 public/class-eb-public.php:170
 msgid "Processing..."
 msgstr ""
 
-#: public/class-eb-public.php:148
+#: public/class-eb-public.php:156
 #: includes/payments/class-eb-payment-manager.php:121
 msgid "Access Course"
 msgstr ""
 
-#: public/class-eb-public.php:157
+#: public/class-eb-public.php:165
 msgid "Search:"
 msgstr ""
 
-#: public/class-eb-public.php:158
+#: public/class-eb-public.php:166
 msgid "No data available in table"
 msgstr ""
 
-#: public/class-eb-public.php:159
+#: public/class-eb-public.php:167
 msgid "Loading..."
 msgstr ""
 
-#: public/class-eb-public.php:160
+#: public/class-eb-public.php:168
 msgid "Search"
 msgstr ""
 
-#: public/class-eb-public.php:161
+#: public/class-eb-public.php:169
 msgid "No matching records found"
 msgstr ""
 
-#: public/class-eb-public.php:163
+#: public/class-eb-public.php:171
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr ""
 
-#: public/class-eb-public.php:164
+#: public/class-eb-public.php:172
 msgid "Showing 0 to 0 of 0 entries"
 msgstr ""
 
-#: public/class-eb-public.php:165
+#: public/class-eb-public.php:173
 msgid "filtered from _MAX_ total entries"
 msgstr ""
 
-#: public/class-eb-public.php:167
+#: public/class-eb-public.php:175
 msgid ","
 msgstr ""
 
-#: public/class-eb-public.php:168
+#: public/class-eb-public.php:176
 msgid "Show _MENU_ entries"
 msgstr ""
 
-#: public/class-eb-public.php:169
+#: public/class-eb-public.php:177
 msgid "First"
 msgstr ""
 
-#: public/class-eb-public.php:170
+#: public/class-eb-public.php:178
 msgid "Last"
 msgstr ""
 
-#: public/class-eb-public.php:171
+#: public/class-eb-public.php:179
 msgid "Next"
 msgstr ""
 
-#: public/class-eb-public.php:172
+#: public/class-eb-public.php:180
 msgid "Previous"
 msgstr ""
 
-#: public/class-eb-public.php:173
+#: public/class-eb-public.php:181
 msgid ": activate to sort column ascending"
 msgstr ""
 
-#: public/class-eb-public.php:174
+#: public/class-eb-public.php:182
 msgid ": activate to sort column descending"
 msgstr ""
 
@@ -1333,7 +1333,7 @@ msgstr ""
 
 #: admin/settings/class-eb-settings-general.php:65
 #, php-format
-msgid "Redirect user to the My Courses page on %s form the %s page."
+msgid "Redirect user to the My Courses page on %s from the %s page."
 msgstr ""
 
 #: admin/settings/class-eb-settings-general.php:69
@@ -1472,6 +1472,99 @@ msgstr ""
 
 #: admin/settings/class-eb-settings-synchronization.php:166
 msgid "Keep synchronized courses as draft"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:33
+msgid "Shortcodes"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:63
+msgid "Edwiser Bridge Shortcodes"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:66
+msgid "Shortcode Options"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:68
+msgid ""
+"You may use shortcodes to add information to any page/course/lesson/quiz. "
+"Here are built-in shortcodes for displaying relavent user information."
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:74
+msgid ""
+"This shortcode shows the user account details,his enrolled courses and "
+"orders placed by him. This shortcode also provides the functoinality to edit "
+"user profile."
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:80
+msgid ""
+"This shortcode shows the list of the edwiser bridge courses. You can use "
+"this shortcode on any page. This shortcode can take following parameters:"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:82
+#, php-format
+msgid ""
+"Sets order of courses. Possible values: DESC, ASC. Example: %s shows courses "
+"in ascending order."
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:83
+#, php-format
+msgid "Sets number of courses per page. Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:84
+#, php-format
+msgid "Shows courses from spesified category slugs. Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:85
+#, php-format
+msgid "Sets number of categorys groups shown per page Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:86
+#, php-format
+msgid ""
+"This shows the courses grouped by the categorys. Possible values:yes,no. "
+"Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:87
+#, php-format
+msgid ""
+"This will shows the courses in one row with horizontal scroll. Possible "
+"values:yes,no. Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:94
+#, php-format
+msgid ""
+"This shortcode shows single course page.This shortcode takes course id as a "
+"parameter. Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:100
+msgid ""
+"This shortcode shows the users enrolled courses list and the courses from "
+"the enrolled courses categorys where user is not enrolled as the recommended "
+"courses. This shortcode can take following parameters."
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:102
+#: admin/settings/class-eb-settings-shortcode-doc.php:103
+#, php-format
+msgid "This will sets the title for the courses wrapper Example: %s"
+msgstr ""
+
+#: admin/settings/class-eb-settings-shortcode-doc.php:104
+#, php-format
+msgid ""
+"This will sets the quntity to show in the recommended courses Example: %s"
 msgstr ""
 
 #: admin/settings/class-eb-settings-paypal.php:34
@@ -1617,6 +1710,7 @@ msgid "Course Overview"
 msgstr ""
 
 #: public/templates/archive-eb_course.php:45
+#: public/shortcodes/class-eb-shortcode-courses.php:188
 msgid "Previous page"
 msgstr ""
 
@@ -1626,14 +1720,6 @@ msgstr ""
 
 #: public/templates/archive-eb_course.php:48
 msgid "Page"
-msgstr ""
-
-#: public/templates/content-eb_course.php:53
-msgid "Click to access."
-msgstr ""
-
-#: public/templates/content-eb_course.php:56
-msgid "Click to read more."
 msgstr ""
 
 #: public/shortcodes/class-eb-shortcode-user-profile.php:142
@@ -1679,38 +1765,46 @@ msgstr ""
 msgid "%s is already exists."
 msgstr ""
 
-#: public/shortcodes/class-eb-shortcode-my-courses.php:89
+#: public/shortcodes/class-eb-shortcode-courses.php:181
+msgid "Courses navigation"
+msgstr ""
+
+#: public/shortcodes/class-eb-shortcode-courses.php:214
+msgid "Next Page"
+msgstr ""
+
+#: public/shortcodes/class-eb-shortcode-my-courses.php:90
 #, php-format
 msgid "You are not logged in. %s to login."
 msgstr ""
 
-#: public/shortcodes/class-eb-shortcode-my-courses.php:122
+#: public/shortcodes/class-eb-shortcode-my-courses.php:123
 #, php-format
 msgid "You are not enrolled to any course. %s to access the courses page."
 msgstr ""
 
-#: public/shortcodes/class-eb-shortcode-my-courses.php:190
+#: public/shortcodes/class-eb-shortcode-my-courses.php:191
 msgid "View More &rarr;"
 msgstr ""
 
 #: public/templates/account/user-profile.php:31
-#: public/templates/account/user-account.php:33
+#: public/templates/account/user-account.php:30
 msgid "Edit Profile"
 msgstr ""
 
 #: public/templates/account/user-profile.php:40
-#: public/templates/account/user-account.php:42
+#: public/templates/account/user-account.php:38
 msgid "S.No."
 msgstr ""
 
 #: public/templates/account/user-profile.php:56
-#: public/templates/account/user-account.php:62
+#: public/templates/account/user-account.php:57
 #, php-format
 msgid "Looks like you are not enrolled in any course, get your first course %s"
 msgstr ""
 
 #: public/templates/account/user-profile.php:57
-#: public/templates/account/user-account.php:66
+#: public/templates/account/user-account.php:57
 msgid "here"
 msgstr ""
 
@@ -1786,32 +1880,32 @@ msgstr ""
 msgid "Back to the profile"
 msgstr ""
 
-#: public/templates/account/user-account.php:25
+#: public/templates/account/user-account.php:23
 #, php-format
 msgid "Hello %s%s%s (not %2$s? %sSign out%s)"
 msgstr ""
 
-#: public/templates/account/user-account.php:78
+#: public/templates/account/user-account.php:69
 msgid "Course Purchase History"
 msgstr ""
 
-#: public/templates/account/user-account.php:84
+#: public/templates/account/user-account.php:77
 msgid "Order ID"
 msgstr ""
 
-#: public/templates/account/user-account.php:86
+#: public/templates/account/user-account.php:81
 msgid "Ordered Course"
 msgstr ""
 
-#: public/templates/account/user-account.php:88
+#: public/templates/account/user-account.php:85
 msgid "Order Date"
 msgstr ""
 
-#: public/templates/account/user-account.php:90
+#: public/templates/account/user-account.php:89
 msgid "Status"
 msgstr ""
 
-#: public/templates/account/user-account.php:100
+#: public/templates/account/user-account.php:114
 msgid "Not Available"
 msgstr ""
 
@@ -1906,7 +2000,7 @@ msgid ""
 "Edwiser Bridge integrates WordPress with the Moodle LMS. The plugin provides "
 "an easy option to import Moodle courses to WordPress and sell them using "
 "PayPal. The plugin also allows automatic registration of WordPress users on "
-"the Moodle web site along with single login credentials for both the systems."
+"the Moodle website along with single login credentials for both the systems."
 msgstr ""
 
 #. URI of the plugin
