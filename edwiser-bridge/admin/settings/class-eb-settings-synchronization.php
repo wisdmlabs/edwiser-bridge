@@ -1,8 +1,6 @@
 <?php
 
-namespace app\wisdmlabs\edwiserBridge;
-
-/*
+/**
  * EDW Product Settings
  *
  * @link       https://edwiser.org
@@ -13,187 +11,182 @@ namespace app\wisdmlabs\edwiserBridge;
  * @author     WisdmLabs <support@wisdmlabs.com>
  */
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
 }
 
-if (!class_exists('EBSettingsSynchronization')) {
+if ( ! class_exists( 'EB_Settings_Synchronization' ) ) :
 
-    /**
-     * EB_Settings_Products.
-     */
-    class EBSettingsSynchronization extends EBSettingsPage
-    {
+	/**
+	 * EB_Settings_Products
+	 */
+	class EB_Settings_Synchronization extends EB_Settings_Page {
 
-        /**
-         * Constructor.
-         */
-        public function __construct()
-        {
-            $this->_id = 'synchronization';
-            $this->label = __('Synchronization', 'eb-textdomain');
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
 
-            add_filter('eb_settings_tabs_array', array($this, 'addSettingsPage'), 20);
-            add_action('eb_settings_'.$this->_id, array($this, 'output'));
-            add_action('eb_settings_save_'.$this->_id, array($this, 'save'));
-            add_action('eb_sections_'.$this->_id, array($this, 'outputSections'));
-        }
+		$this->id    = 'synchronization';
+		$this->label = __( 'Synchronization', 'eb-textdomain' );
 
-        /**
-         * Get sections.
-         *
-         * @since  1.0.0
-         *
-         * @return array
-         */
-        public function getSections()
-        {
-            $sections = array(
-                '' => __('Courses', 'eb-textdomain'),
-                'user_data' => __('Users', 'eb-textdomain'),
-            );
+		add_filter( 'eb_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
+		add_action( 'eb_settings_' . $this->id, array( $this, 'output' ) );
+		add_action( 'eb_settings_save_' . $this->id, array( $this, 'save' ) );
+		add_action( 'eb_sections_' . $this->id, array( $this, 'output_sections' ) );
+	}
 
-            return apply_filters('eb_getSections_'.$this->_id, $sections);
-        }
+	/**
+	 * Get sections
+	 *
+	 * @since  1.0.0
+	 * @return array
+	 */
+	public function get_sections() {
 
-        /**
-         * Output the settings.
-         *
-         * @since  1.0.0
-         */
-        public function output()
-        {
-            global $current_section;
+		$sections = array(
+			''            => __( 'Courses', 'eb-textdomain' ),
+			'user_data'   => __( 'Users', 'eb-textdomain' )
+		);
 
-            // Hide the save button
-            $GLOBALS['hide_save_button'] = true;
+		return apply_filters( 'eb_get_sections_' . $this->id, $sections );
+	}
 
-            $settings = $this->getSettings($current_section);
+	/**
+	 * Output the settings
+	 *
+	 * @since  1.0.0
+	 */
+	public function output() {
+		global $current_section;
 
-            EbAdminSettings::outputFields($settings);
-        }
+		// Hide the save button
+		$GLOBALS['hide_save_button'] = true;
 
-        /**
-         * Save settings.
-         *
-         * @since  1.0.0
-         */
-        public function save()
-        {
-            global $current_section;
+		$settings = $this->get_settings( $current_section );
 
-            $settings = $this->getSettings($current_section);
-            EbAdminSettings::saveFields($settings);
-        }
+		EB_Admin_Settings::output_fields( $settings );
+	}
 
-        /**
-         * Get settings array.
-         *
-         * @since  1.0.0
-         *
-         * @return array
-         */
-        public function getSettings($current_section = '')
-        {
-            if ('user_data' == $current_section) {
-                $settings = apply_filters('eb_user_synchronization_settings', array(
+	/**
+	 * Save settings
+	 *
+	 * @since  1.0.0
+	 */
+	public function save() {
+		global $current_section;
 
-                    array(
-                        'title' => __('Synchronize User Data', 'eb-textdomain'),
-                        'type' => 'title',
-                        'id' => 'user_synchronization_options',
-                    ),
+		$settings = $this->get_settings( $current_section );
+		EB_Admin_Settings::save_fields( $settings );
+	}
 
-                    array(
-                        'title' => __('Synchronization Options', 'eb-textdomain'),
-                        'desc' => __('Update user\'s course enrollment status', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_user_courses',
-                        //'custom_attributes' => array( 'disabled' => 'disabled' ),
-                        'default' => 'no',
-                        'type' => 'checkbox',
-                        'checkboxgroup' => 'start',
-                        'show_if_checked' => 'option',
-                        'autoload' => false,
+	/**
+	 * Get settings array
+	 *
+	 * @since  1.0.0
+	 * @return array
+	 */
+	public function get_settings( $current_section = '' ) {
+		if ( 'user_data' == $current_section ) {
 
-                    ),
+			$settings = apply_filters( 'eb_user_synchronization_settings', array(
 
-                    array(
-                        'title' => __('', 'eb-textdomain'),
-                        'desc' => __('', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_users_button',
-                        'default' => 'Start Synchronization',
-                        'type' => 'button',
-                        'desc_tip' => false,
-                        'class' => 'button secondary',
-                    ),
+					array(
+						'title'  => __( 'Synchronize User Data', 'eb-textdomain' ),
+						'type'   => 'title',
+						'id'     => 'user_synchronization_options'
+					),
 
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'user_synchronization_options',
-                    ),
+					array(
+						'title'           => __( 'Synchronization Options', 'eb-textdomain' ),
+						'desc'            => __( 'Update user\'s course enrollment status', 'eb-textdomain' ),
+						'id'              => 'eb_synchronize_user_courses',
+						//'custom_attributes' => array( 'disabled' => 'disabled' ),
+						'default'         => 'no',
+						'type'            => 'checkbox',
+						'checkboxgroup'   => 'start',
+						'show_if_checked' => 'option',
+						'autoload'        => false
 
-                ));
-            } else {
-                $settings = apply_filters('eb_course_synchronization_settings', array(
-                    array(
-                        'title' => __('Synchronize Courses', 'eb-textdomain'),
-                        'type' => 'title',
-                        'id' => 'course_synchronization_options',
-                    ),
+					),
 
-                    array(
-                        'title' => __('Synchronization Options', 'eb-textdomain'),
-                        'desc' => __('Synchronize course categories', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_categories',
-                        'default' => 'no',
-                        'type' => 'checkbox',
-                        'checkboxgroup' => 'start',
-                        'show_if_checked' => 'option',
-                        'autoload' => false,
-                    ),
+					array(
+						'title'    => __( '', 'eb-textdomain' ),
+						'desc'     => __( '', 'eb-textdomain' ),
+						'id'       => 'eb_synchronize_users_button',
+						'default'  => 'Start Synchronization',
+						'type'     => 'button',
+						'desc_tip' =>  false,
+						'class'    => 'button secondary'
+					),
 
-                    array(
-                        'desc' => __('Update previously synchronized courses', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_previous',
-                        'default' => 'no',
-                        'type' => 'checkbox',
-                        'checkboxgroup' => '',
-                        'show_if_checked' => 'no',
-                        'autoload' => false,
-                    ),
+					array(
+						'type'  => 'sectionend',
+						'id'    => 'user_synchronization_options'
+					),
 
-                    array(
-                        'desc' => __('Keep synchronized courses as draft', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_draft',
-                        'default' => 'yes',
-                        'type' => 'checkbox',
-                        'checkboxgroup' => '',
-                        'show_if_checked' => 'yes',
-                        'autoload' => false,
-                    ),
+				) );
+		} else {
+			$settings = apply_filters( 'eb_course_synchronization_settings', array(
+					array(
+						'title'  => __( 'Synchronize Courses', 'eb-textdomain' ),
+						'type'   => 'title',
+						'id'     => 'course_synchronization_options'
+					),
 
-                    array(
-                        'title' => __('', 'eb-textdomain'),
-                        'desc' => __('', 'eb-textdomain'),
-                        'id' => 'eb_synchronize_courses_button',
-                        'default' => 'Start Synchronization',
-                        'type' => 'button',
-                        'desc_tip' => false,
-                        'class' => 'button secondary',
-                    ),
+					array(
+						'title'           => __( 'Synchronization Options', 'eb-textdomain' ),
+						'desc'            => __( 'Synchronize course categories', 'eb-textdomain' ),
+						'id'              => 'eb_synchronize_categories',
+						'default'         => 'no',
+						'type'            => 'checkbox',
+						'checkboxgroup'   => 'start',
+						'show_if_checked' => 'option',
+						'autoload'        => false
+					),
 
-                    array(
-                        'type' => 'sectionend',
-                        'id' => 'course_synchronization_options',
-                    ),
+					array(
+						'desc'            => __( 'Update previously synchronized courses', 'eb-textdomain' ),
+						'id'              => 'eb_synchronize_previous',
+						'default'         => 'no',
+						'type'            => 'checkbox',
+						'checkboxgroup'   => '',
+						'show_if_checked' => 'no',
+						'autoload'        => false
+					),
 
-                ));
-            }
+					array(
+						'desc'            => __( 'Keep synchronized courses as draft', 'eb-textdomain' ),
+						'id'              => 'eb_synchronize_draft',
+						'default'         => 'yes',
+						'type'            => 'checkbox',
+						'checkboxgroup'   => '',
+						'show_if_checked' => 'yes',
+						'autoload'        => false
+					),
 
-            return apply_filters('eb_get_settings_'.$this->_id, $settings, $current_section);
-        }
-    }
+					array(
+						'title'    => __( '', 'eb-textdomain' ),
+						'desc'     => __( '', 'eb-textdomain' ),
+						'id'       => 'eb_synchronize_courses_button',
+						'default'  => 'Start Synchronization',
+						'type'     => 'button',
+						'desc_tip' =>  false,
+						'class'    => 'button secondary'
+					),
 
+					array(
+						'type'  => 'sectionend',
+						'id'  => 'course_synchronization_options'
+					),
+
+				) );
+		}
+
+		return apply_filters( 'eb_get_settings_' . $this->id, $settings, $current_section );
+	}
 }
 
-return new EBSettingsSynchronization();
+endif;
+
+return new EB_Settings_Synchronization();

@@ -8,22 +8,21 @@
  * @link       https://edwiser.org
  * @since      1.0.0
  *
+ * @package    Edwiser Bridge
+ * @subpackage Edwiser Bridge/includes
  * @author     WisdmLabs <support@wisdmlabs.com>
  */
+class EB_Deactivator {
 
-namespace app\wisdmlabs\edwiserBridge;
+	/**
+	 * Short Description. (use period)
+	 *
+	 * Long Description.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function deactivate() {
 
-class EBDeactivator
-{
+	}
 
-    /**
-     * Short Description. (use period).
-     *
-     * Long Description.
-     *
-     * @since    1.0.0
-     */
-    public static function deactivate()
-    {
-    }
 }

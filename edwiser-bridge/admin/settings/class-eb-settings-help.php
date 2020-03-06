@@ -1,8 +1,6 @@
 <?php
 
-namespace app\wisdmlabs\edwiserBridge;
-
-/*
+/**
  * Edwiser Bridge user help page
  *
  * @link       https://edwiser.org
@@ -13,96 +11,89 @@ namespace app\wisdmlabs\edwiserBridge;
  * @author     WisdmLabs <support@wisdmlabs.com>
  */
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
 }
 
-if (!class_exists('EBSettingsGetHelp')) :
+if ( ! class_exists( 'EB_Settings_Get_Help' ) ) :
 
-    /**
-     * EbSettingsPayPal.
-     */
-    class EBSettingsGetHelp extends EBSettingsPage
-    {
+	/**
+	 * EB_Settings_PayPal
+	 */
+	class EB_Settings_Get_Help extends EB_Settings_Page {
 
-        /**
-         * Constructor.
-         */
-        public function __construct()
-        {
-            $this->_id = 'get-help';
-            $this->label = __('Get Help', 'eb-textdomain');
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
 
-            add_filter('eb_settings_tabs_array', array($this, 'addSettingsPage'), 20);
-            //add_action( 'eb_settings_' . $this->_id, array( $this, 'output' ) );
-            //add_action( 'eb_settings_save_' . $this->_id, array( $this, 'save' ) );
-            add_action('admin_action_eb_help', array($this, 'helpSubscribeHandler'));
-        }
+		$this->id    = 'get-help';
+		$this->label = __( 'Get Help', 'eb-textdomain' );
 
-        /**
-         * Output the settings.
-         *
-         * @since  1.0.0
-         */
-        public function output()
-        {
-            //global $current_section;
+		add_filter( 'eb_settings_tabs_array', array( $this, 'add_settings_page' ), 20 );
+		//add_action( 'eb_settings_' . $this->id, array( $this, 'output' ) );
+		//add_action( 'eb_settings_save_' . $this->id, array( $this, 'save' ) );
+		add_action( 'admin_action_eb_help', array( $this, 'help_subscribe_handler' ) );
+	}
 
-            // Hide the save button
-            $GLOBALS['hide_save_button'] = true;
-        }
+	/**
+	 * Output the settings
+	 *
+	 * @since  1.0.0
+	 */
+	public function output() {
+		global $current_section;
 
-        /**
-         * user help subscription form handler.
-         *
-         * We get user's email for providing help regarding plugin functionality.
-         *
-         * @since  1.0.0
-         */
-        public function userHelpHandler()
-        {
+		// Hide the save button
+		$GLOBALS['hide_save_button'] = true;
 
-            // verify nonce
-            if (!isset($_POST['subscribe_nonce_field']) ||
-                    !wp_verify_nonce($_POST['subscribe_nonce_field'], 'subscribe_nonce')
-            ) {
-                _e('Sorry, there is a problem!', 'eb-textdomain');
-                exit;
-            } else {
-                // process subscription
-                $plugin_author_email = 'bharat.pareek@edwiser.org';
+		
+	}
 
-                $admin_email = filter_input(INPUT_POST, 'eb_sub_admin_email', FILTER_VALIDATE_EMAIL);
+	/**
+	 * user help subscription form handler
+	 *
+	 * We get user's email for providing help regarding plugin functionality.
+	 *
+	 * @since  1.0.0
+	 */
+	public function user_help_handler() {
 
-                // prepare email content
-                $subject = apply_filters(
-                    'eb_plugin_subscription_email_subject',
-                    __('Edwiser Bridge Plugin Subscription Notification', 'eb-textdomain')
-                );
+		// verify nonce
+		if (
+			! isset( $_POST['subscribe_nonce_field'] ) || ! wp_verify_nonce( $_POST['subscribe_nonce_field'], 'subscribe_nonce' )
+		) {
 
-                $message = sprintf(
-                    __("Edwiser subscription user details: \n\nCustomer Website: %s \nCustomer Email: %s", 'eb-textdomain'),
-                    site_url(),
-                    $admin_email
-                );
+			print 'Sorry, there is a problem!';
+			exit;
 
-                // $message = "Edwiser subscription user details: \n";
-                // $message .= "\nCustomer Website:\n".site_url();
-                // $message .= "\n\nCustomer Email: \n";
-                // $message .= $admin_email;
+		} else {
 
-                $sent = wp_mail($plugin_author_email, $subject, $message);
+			// process subscription
+			$plugin_author_email = 'bharat.pareek@edwiser.org';
 
-                if ($sent) {
-                    $subscribed = 1;
-                }
-            }
+			$admin_email = filter_input( INPUT_POST, "eb_sub_admin_email", FILTER_VALIDATE_EMAIL );
 
-            wp_redirect(admin_url('/?page=eb-about&subscribed='.$subscribed));
-            exit;
-        }
-    }
+			// prepare email content
+			$subject = apply_filters( 'eb_plugin_subscription_email_subject', 'Edwiser Bridge Plugin Subscription Notification' );
+
+			$message = "Edwiser subscription user details: \n";
+			$message .= "\nCustomer Website:\n". site_url();
+			$message .= "\n\nCustomer Email: \n";
+			$message .= $admin_email;
+
+			$sent = wp_mail( $plugin_author_email, $subject, $message );
+
+			if ( $sent ) {
+				$subscribed = 1;
+			}
+		}
+
+		wp_redirect( admin_url( '/?page=eb-about&subscribed='.$subscribed ) );
+		exit;
+	}
+}
 
 endif;
 
-return new EBSettingsGetHelp();
+return new EB_Settings_Get_Help();

@@ -10,11 +10,7 @@
  * @subpackage Edwiser Bridge/admin
  * @author     WisdmLabs <support@wisdmlabs.com>
  */
-
-namespace app\wisdmlabs\edwiserBridge;
-
-class EBSettingsAjaxInitiater
-{
+class EB_Settings_Ajax_Initiater {
 
     /**
      * The ID of this plugin.
@@ -23,7 +19,7 @@ class EBSettingsAjaxInitiater
      * @access   private
      * @var      string    $plugin_name    The ID of this plugin.
      */
-    private $plugin_name;
+    private $__plugin_name;
 
     /**
      * The version of this plugin.
@@ -32,12 +28,11 @@ class EBSettingsAjaxInitiater
      * @access   private
      * @var      string    $version    The current version of this plugin.
      */
-    private $version;
+    private $__version;
 
-    public function __construct($plugin_name, $version)
-    {
+    public function __construct( $plugin_name, $version ) {
         $this->plugin_name = $plugin_name;
-        $this->version = $version;
+        $this->version     = $version;
     }
 
     /**
@@ -48,23 +43,23 @@ class EBSettingsAjaxInitiater
      *
      * @return
      */
-    public function courseSynchronizationInitiater()
-    {
-        if (!isset($_POST['_wpnonce_field'])) {
-            die('Busted!');
+    public function course_synchronization_initiater() {
+
+        if ( !isset( $_POST['_wpnonce_field'] ) ) {
+            die( 'Busted!' );
         }
 
         // verifying generated nonce we created earlier
-        if (!wp_verify_nonce($_POST['_wpnonce_field'], 'check_sync_action')) {
-            die('Busted!');
+        if ( !wp_verify_nonce( $_POST['_wpnonce_field'], 'check_sync_action' ) ) {
+            die( 'Busted!' );
         }
 
         // get sync options
-        $sync_options = json_decode(stripslashes($_POST['sync_options']), true);
+        $sync_options = json_decode( stripslashes( $_POST['sync_options'] ), true );
 
         // start working on request
-        $response = edwiserBridgeInstance()->courseManager()->courseSynchronizationHandler($sync_options);
-        echo json_encode($response);
+        $response       = EB()->course_manager()->course_synchronization_handler( $sync_options );
+        echo json_encode( $response );
         die();
     }
 
@@ -76,56 +71,55 @@ class EBSettingsAjaxInitiater
      *
      * @return
      */
-    public function userDataSynchronizationInitiater()
-    {
-        if (!isset($_POST['_wpnonce_field'])) {
-            die('Busted!');
+    public function user_data_synchronization_initiater() {
+
+        if ( !isset( $_POST['_wpnonce_field'] ) ) {
+            die( 'Busted!' );
         }
 
         // verifying generated nonce we created earlier
-        if (!wp_verify_nonce($_POST['_wpnonce_field'], 'check_sync_action')) {
-            die('Busted!');
+        if ( !wp_verify_nonce( $_POST['_wpnonce_field'], 'check_sync_action' ) ) {
+            die( 'Busted!' );
         }
 
         // get sync options
-        $sync_options = json_decode(stripslashes($_POST['sync_options']), true);
+        $sync_options = json_decode( stripslashes( $_POST['sync_options'] ), true );
 
-        //$response = edwiserBridgeInstance()->userManager()->user_course_synchronization_handler( $sync_user_courses );
-        $response = edwiserBridgeInstance()->userManager()->userCourseSynchronizationHandler($sync_options);
+        //$response = EB()->user_manager()->user_course_synchronization_handler( $sync_user_courses );
+        $response = EB()->user_manager()->user_course_synchronization_handler( $sync_options );
 
-        echo json_encode($response);
+        echo json_encode( $response );
         die();
     }
 
     /**
      * Test connection between wordpress and moodle
      *
-     * Calls connection_test_helper() from EBConnectionHelper class
+     * Calls connection_test_helper() from EB_Connection_Helper class
      *
      * @since    1.0.0
      * @access   public
      *
      * @return boolean true on success else false
      */
-    public function connectionTestInitiater()
-    {
-        if (!isset($_POST['_wpnonce_field'])) {
-            die('Busted!');
+    public function connection_test_initiater() {
+        if ( !isset( $_POST['_wpnonce_field'] ) ) {
+            die( 'Busted!' );
         }
 
         // verifying generated nonce we created earlier
-        if (!wp_verify_nonce($_POST['_wpnonce_field'], 'check_sync_action')) {
-            die('Busted!');
+        if ( !wp_verify_nonce( $_POST['_wpnonce_field'], 'check_sync_action' ) ) {
+            die( 'Busted!' );
         }
 
         //start working on request
-        $url = $_POST['url'];
+        $url   = $_POST['url'];
         $token = $_POST['token'];
 
-        $connection_helper = new EBConnectionHelper($this->plugin_name, $this->version);
-        $response = $connection_helper->connectionTestHelper($url, $token);
+        $connection_helper = new EB_Connection_Helper( $this->plugin_name, $this->version );
+        $response          = $connection_helper->connection_test_helper( $url, $token );
 
-        echo json_encode($response);
+        echo json_encode( $response );
         die();
     }
 }

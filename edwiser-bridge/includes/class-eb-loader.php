@@ -14,11 +14,7 @@
  * @subpackage Edwiser Bridge/includes
  * @author     WisdmLabs <support@wisdmlabs.com>
  */
-
-namespace app\wisdmlabs\edwiserBridge;
-
-class EBLoader
-{
+class EB_Loader {
 
     /**
      * The array of actions registered with WordPress.
@@ -43,10 +39,11 @@ class EBLoader
      *
      * @since    1.0.0
      */
-    public function __construct()
-    {
+    public function __construct() {
+
         $this->actions = array();
         $this->filters = array();
+
     }
 
     /**
@@ -59,9 +56,8 @@ class EBLoader
      * @param int     Optional    $priority         The priority at which the function should be fired.
      * @param int     Optional    $accepted_args    The number of arguments that should be passed to the $callback.
      */
-    public function addAction($hook, $component, $callback, $priority = 10, $accepted_args = 1)
-    {
-        $this->actions = $this->add($this->actions, $hook, $component, $callback, $priority, $accepted_args);
+    public function add_action( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
+        $this->actions = $this->add( $this->actions, $hook, $component, $callback, $priority, $accepted_args );
     }
 
     /**
@@ -74,9 +70,8 @@ class EBLoader
      * @param int     Optional    $priority         The priority at which the function should be fired.
      * @param int     Optional    $accepted_args    The number of arguments that should be passed to the $callback.
      */
-    public function addFilter($hook, $component, $callback, $priority = 10, $accepted_args = 1)
-    {
-        $this->filters = $this->add($this->filters, $hook, $component, $callback, $priority, $accepted_args);
+    public function add_filter( $hook, $component, $callback, $priority = 10, $accepted_args = 1 ) {
+        $this->filters = $this->add( $this->filters, $hook, $component, $callback, $priority, $accepted_args );
     }
 
     /**
@@ -93,17 +88,18 @@ class EBLoader
      * @param int     Optional    $accepted_args    The number of arguments that should be passed to the $callback.
      * @return   type                                   The collection of actions and filters registered with WordPress.
      */
-    private function add($hooks, $hook, $component, $callback, $priority, $accepted_args)
-    {
+    private function add( $hooks, $hook, $component, $callback, $priority, $accepted_args ) {
+
         $hooks[] = array(
-            'hook' => $hook,
-            'component' => $component,
-            'callback' => $callback,
-            'priority' => $priority,
+            'hook'          => $hook,
+            'component'     => $component,
+            'callback'      => $callback,
+            'priority'      => $priority,
             'accepted_args' => $accepted_args,
         );
 
         return $hooks;
+
     }
 
     /**
@@ -111,30 +107,16 @@ class EBLoader
      *
      * @since    1.0.0
      */
-    public function run()
-    {
-        foreach ($this->filters as $hook) {
-            add_filter(
-                $hook['hook'],
-                array(
-                $hook['component'],
-                $hook['callback']
-                    ),
-                $hook['priority'],
-                $hook['accepted_args']
-            );
+    public function run() {
+
+        foreach ( $this->filters as $hook ) {
+            add_filter( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
         }
 
-        foreach ($this->actions as $hook) {
-            add_action(
-                $hook['hook'],
-                array(
-                $hook['component'],
-                $hook['callback']
-                    ),
-                $hook['priority'],
-                $hook['accepted_args']
-            );
+        foreach ( $this->actions as $hook ) {
+            add_action( $hook['hook'], array( $hook['component'], $hook['callback'] ), $hook['priority'], $hook['accepted_args'] );
         }
+
     }
+
 }
