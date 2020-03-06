@@ -2,7 +2,7 @@
 Contributors: WisdmLabs
 Tags: WordPress, Moodle, Courses, Users, Synchronization, Sell Courses, Learning Management System, LMS, LMS Integration, Moodle WordPress, WordPress Moodle, WP Moodle,
 Requires at least: 4.0
-Tested up to: 4.4.2
+Tested up to: 4.5.3
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -78,6 +78,12 @@ Selectively synchronize Moodle courses or courses belonging to a particular cate
 
 <a href = "https://edwiser.org/bridge/extensions/selective-synchronization/">Selective Synchronization for Edwiser Bridge</a>
 
+**Bulk Purchase for Edwiser Bridge**
+
+Purchase more than one Moodle course through WooCommerce at one go and enroll your students in it.
+
+<a href = "https://edwiser.org/bridge/extensions/bulk-purchase/">Bulk Purchase for Edwiser Bridge</a>
+
 
  ==  Installation  == 
 
@@ -128,6 +134,9 @@ Take a look at the link below to see the full list of questions which will help 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
  ==  Changelog  == 
+=  1.1.2  =
+* Added new currency in PayPal for the Australian Dollar,Polish Zloty,Danish Krone and Singapore Dollar.
+* Fix - Resolved Paypal Sandbox mode issue.
 
 =  1.1.1  = 
 * Fix - Minor issue in page creation functionality.
