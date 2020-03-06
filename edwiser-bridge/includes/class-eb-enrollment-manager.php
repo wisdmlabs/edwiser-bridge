@@ -205,7 +205,7 @@ class EB_Enrollment_Manager {
 
         // exit if no associated moodle user found.
         if ( !is_numeric( $moodle_user_id ) ) {
-            exit( 0 );
+            return;
         }
 
         EB()->logger()->add( 'user', 'Starting to update course access....' ); // add user log

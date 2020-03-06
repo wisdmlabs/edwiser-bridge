@@ -465,7 +465,7 @@ class EB_User_Manager {
 		$user_data = apply_filters( 'eb_moodle_user_profile_details', $user_data, $update );
 
 		// confirm that username is in lowercase always
-		if( isset( $userdata['username'] ) ){
+		if( isset( $user_data['username'] ) ){
 			$user_data['username'] = strtolower( $user_data['username'] );
 		}
 
@@ -764,7 +764,7 @@ class EB_User_Manager {
 
 		if ( !is_numeric( $moodle_user_id ) ) {
 			EB()->logger()->add( 'user', 'A moodle user id is not associated.... Exiting!!!' ); // add user log
-			exit( 0 );
+			return;
 		}
 
 		if ( isset( $pass ) && !empty( $pass ) ) {

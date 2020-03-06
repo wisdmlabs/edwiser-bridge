@@ -119,8 +119,15 @@ No, this is not possible using Edwiser Bridge.
 Take a look at the link below to see the full list of questions which will help you around the Edwiser Bridge plugin. 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
+## Upgrade Notice ##
+
+### 1.0.1 ###
+We have fixed some bugs that could cause errors during user creation & enrollment process.
 
  ==  Changelog  == 
+
+ =  1.0.1  = 
+* Fixed a bug that could cause problems on password reset & user enrollment process
 
  =  1.0  = 
 * Plugin Launched
