@@ -108,7 +108,7 @@ class EdwiserBridge
     public function __construct()
     {
         $this->plugin_name = 'edwiserbridge';
-        $this->version = '1.4.1';
+        $this->version = '1.4.2';
         $this->defineConstants();
         $this->loadDependencies();
         $this->setLocale();
@@ -665,6 +665,11 @@ class EdwiserBridge
             'wp_ajax_handleUserCourseSynchronization',
             $admin_settings_init,
             'userDataSynchronizationInitiater'
+        );
+        $this->loader->addAction(
+            'wp_ajax_handleUserLinkToMoodle',
+            $admin_settings_init,
+            'usersLinkToMoodleSynchronization'
         );
         $this->loader->addAction(
             'wp_ajax_handleConnectionTest',
