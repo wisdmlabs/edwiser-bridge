@@ -1,8 +1,8 @@
 === Edwiser Bridge - WordPress Moodle LMS Integration === 
 Contributors: WisdmLabs
 Tags: WordPress, Moodle, Courses, Users, Synchronization, Sell Courses, Learning Management System, LMS, LMS Integration, Moodle WordPress, WordPress Moodle, WP Moodle,
-Requires at least: 3.9.0
-Tested up to: 4.2.2
+Requires at least: 4.0
+Tested up to: 4.3.1
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -72,11 +72,17 @@ The Single Sign On extension for Edwiser Bridge facilitates simultaneous login t
 
 <a href = "https://edwiser.org/bridge/extensions/single-sign-on/">Single Sign On for Edwiser Bridge</a>
 
+**Selective Synchronization for Edwiser Bridge**
+
+Selectively synchronize Moodle courses or courses belonging to a particular category using the Selective Syncronization extension for Edwiser Bridge.
+
+<a href = "https://edwiser.org/bridge/extensions/selective-synchronization/">Selective Synchronization for Edwiser Bridge</a>
+
 
  ==  Installation  == 
 
  = Minimum Requirements = 
-* WordPress 3.9 or higher
+* WordPress 4.0 or higher
 * Moodle 2.9 or higher
 
  =  Automatic Installation  = 
@@ -102,7 +108,8 @@ Take a look at the link below and follow the steps provided to configure your Mo
 3. Course Synchronization from Moodle to WordPress
 4. User Enrollment Data Synchronization
 5. Imported Moodle courses in the WordPress Backend 
-6. Order Details of Courses Purchased from WordPress  
+6. Order Details of Courses Purchased from WordPress
+7. User Profile Shortcode with List of Enrolled Courses
 
 
  ==  Frequently Asked Questions  == 
@@ -121,10 +128,16 @@ Take a look at the link below to see the full list of questions which will help 
 
 ## Upgrade Notice ##
 
-### 1.0.1 ###
-We have fixed some bugs that could cause errors during user creation & enrollment process.
+### 1.0.2 ###
+Implemented minor tweaks to improve performance & remove errors in synchronization process between WordPress and Moodle.
 
  ==  Changelog  == 
+
+ =  1.0.2  = 
+* Added a new shortcode [eb_user_profile] which creates a user profile page that lists users data & enrolled courses.
+* Fixed timeout problem in course enrollment.
+* Fixed a bug that was preventing plugin translation.
+* Minor modifications to improve enrollment & synchronization process.
 
  =  1.0.1  = 
 * Fixed a bug that could cause problems on password reset & user enrollment process

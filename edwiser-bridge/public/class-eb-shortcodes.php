@@ -18,7 +18,8 @@ class EB_Shortcodes {
 	public static function init() {
 		// Define shortcodes
 		$shortcodes = array(
-			'eb_user_account'        => __CLASS__ . '::user_account'
+			'eb_user_account'    => __CLASS__ . '::user_account',
+			'eb_user_profile'	 => __CLASS__ . '::user_profile'
 		);
 
 		foreach ( $shortcodes as $shortcode => $function ) {
@@ -38,7 +39,7 @@ class EB_Shortcodes {
 		$function,
 		$atts    = array(),
 		$wrapper = array(
-			'class'  => 'eb-textdomain',
+			'class'  => '',
 			'before' => null,
 			'after'  => null
 		)
@@ -64,5 +65,16 @@ class EB_Shortcodes {
 	 */
 	public static function user_account( $atts ) {
 		return self::shortcode_wrapper( array( 'EB_Shortcode_User_Account', 'output' ), $atts );
+	}
+
+	/**
+	 * user profile shortcode, display user details & courses on one page.
+	 *
+	 * @since  1.0.2
+	 * @param mixed   $atts
+	 * @return string
+	 */
+	public static function user_profile( $atts ) {
+		return self::shortcode_wrapper( array( 'EB_Shortcode_User_Profile', 'output' ), $atts );
 	}
 }

@@ -102,7 +102,7 @@ class EdwiserBridge {
      */
     public function __construct() {
         $this->plugin_name = 'edwiserbridge';
-        $this->version     = '1.0.0';
+        $this->version     = '1.0.2';
         $this->define_constants();
         $this->load_dependencies();
         $this->set_locale();
@@ -306,6 +306,7 @@ class EdwiserBridge {
          */
         require_once EB_PLUGIN_DIR . 'public/class-eb-shortcodes.php';
         require_once EB_PLUGIN_DIR . 'public/shortcodes/class-eb-shortcode-user-account.php';
+        require_once EB_PLUGIN_DIR . 'public/shortcodes/class-eb-shortcode-user-profile.php';
 
         /**
          * The class responsible for handling frontend forms, specifically login & registration forms.
@@ -324,7 +325,7 @@ class EdwiserBridge {
      */
     private function set_locale() {
         $plugin_i18n = new EB_i18n();
-        $plugin_i18n->set_domain( $this->get_plugin_name() );
+        $plugin_i18n->set_domain( 'eb-textdomain' );
 
         $this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
     }
@@ -508,6 +509,11 @@ class EdwiserBridge {
         $this->loader->add_action( 'before_delete_post', $this->course_manager(), 'delete_enrollment_records_on_course_deletion' );
         $this->loader->add_action( 'manage_eb_course_posts_columns', $this->course_manager(), 'add_course_price_type_column', 10, 1 );
         $this->loader->add_action( 'manage_eb_course_posts_custom_column', $this->course_manager(), 'add_course_price_type_column_content', 10, 2 );
+
+        
+        // wp_remote_post() has default timeout set as 5 seconds, increase it to remove timeout problem
+        $this->loader->add_filter( 'http_request_timeout', $this->connection_helper(), 'connection_timeout_extender' );
+        
     }
 
     /**

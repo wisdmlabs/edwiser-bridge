@@ -86,12 +86,24 @@ class EB_Connection_Helper {
     }
 
     /**
+     * wp_remote_post() has default timeout set as 5 seconds
+     * increase it to 40 seconds to remove timeout problem
+     *
+     * @since  1.0.2
+     * @param  int     $time seconds before timeout
+     * @return int       
+     */
+    public function connection_timeout_extender( $time ) {
+        return 50;
+    }
+
+    /**
      * sends an API request to moodle server based on the credentials entered by user.
      * returns response to ajax initiater
      *
      * @since     1.0.0
-     * @param [type]  $url   moodle URL
-     * @param [type]  $token moodle access token
+     * @param string  $url   moodle URL
+     * @param string  $token moodle access token
      *
      * @return array returns array containing the success & response message
      */
@@ -132,9 +144,9 @@ class EB_Connection_Helper {
      *
      * fetches data from moodle and returns response.
      *
-     * @since     1.0.0
-     * @param string  $webservice_function accepts webservice function as an argument
-     * @return array                       returns response to caller function
+     * @since  1.0.0
+     * @param  string  $webservice_function accepts webservice function as an argument
+     * @return array                        returns response to caller function
      */
     public function connect_moodle_helper( $webservice_function = null ) {
         $success          = 1;

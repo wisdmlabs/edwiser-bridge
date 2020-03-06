@@ -36,7 +36,7 @@ class EB_Admin_Extensions {
 				$extensions = json_decode( wp_remote_retrieve_body( $extensions_json ) );
 
 				if ( $extensions ) {
-					set_transient( 'edwiser_bridge_extensions_data', $extensions, WEEK_IN_SECONDS );
+					set_transient( 'edwiser_bridge_extensions_data', $extensions, 72 * HOUR_IN_SECONDS );
 				}
 			}
 		}

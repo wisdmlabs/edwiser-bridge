@@ -81,102 +81,6 @@ class EB_Enrollment_Manager {
      * Used to enroll user to course(s)
      * Enrolls user to course on moodle on course purchase as well as update enrollment data on WordPress
      *
-     * @param int     $user_id WordPress user id of a user
-     * @param array   $courses WordPress course id of courses
-     * @param boolean false
-     * @return boolean true / false
-     */
-    // public function update_user_course_enrollment( $user_id, $courses = array() ) {
-    //     global $wpdb;
-
-    //     EB()->logger()->add( 'user', 'Starting to give course access....' ); // add user log
-
-    //     $enrolments          = array();
-    //     $webservice_function = 'enrol_manual_enrol_users';
-    //     $role_id             = 5;
-    //     $suspend_access      = 0;
-
-    //     EB()->logger()->add( 'user', 'Checking if a user has associated moodle account....' ); // add user log
-
-    //     // get moodle user id of user
-    //     $moodle_user_id = get_user_meta( $user_id, 'moodle_user_id', true );
-
-    //     EB()->logger()->add( 'user', 'Associated moodle a/c found? :'.( ( $moodle_user_id )? "Yes, Moodle user ID is: ".$moodle_user_id:"No, Exiting!!!" ) ); // add user log
-
-    //     // exit if no associated moodle user found.
-    //     if ( !is_numeric( $moodle_user_id ) ) {
-    //         exit( 0 );
-    //     }
-
-    //     EB()->logger()->add( 'user', 'Starting to give course access....' ); // add user log
-
-    //     // get moodle course id of each course
-    //     // we are fetching course id  of each course as on moodle, to send enrollment request on moodle.
-    //     $moodle_courses = array_map( array( EB()->course_manager(), 'get_moodle_course_id' ), $courses );
-
-    //     // logging
-    //     EB()->logger()->add( 'user', 'Course IDs: '.serialize( $courses ) ); // add user log
-    //     EB()->logger()->add( 'user', 'Respective moodle course IDs: '.serialize( $moodle_courses ) ); // add user log
-    //     EB()->logger()->add( 'user', "\n" ); // add user log
-
-    //     // prepare course array
-    //     foreach ( $moodle_courses as $key => $moodle_course ) {
-
-    //         // first we check if a moodle course id exists
-    //         if ( $moodle_course != '' ) {
-    //             $enrolments[$key] = array(
-    //                 'roleid'   => $role_id,
-    //                 'userid'   => $moodle_user_id,
-    //                 'courseid' => $moodle_course
-    //             );
-    //         }
-    //     }
-
-    //     // prepare request data
-    //     $request_data      = array( 'enrolments' => $enrolments );
-    //     $response          = EB()->connection_helper()->connect_moodle_with_args_helper( $webservice_function, $request_data );
-
-    //     EB()->logger()->add( 'user', "\n Enrollment response: ".serialize( $response ) ); // add user log
-
-    //     // add enrollment details on enrollment table
-    //     if ( $response['success'] && $suspend_access == 0 ) {
-    //         // add enrollment record in DB
-    //         // We are using user's wordpress ID and course's wordpress ID while saving record in enrollment table.
-    //         foreach ( $courses as $key => $course_id ) {
-    //             if ( EB()->course_manager()->get_moodle_course_id( $course_id ) != '' && !$this->user_has_course_access( $user_id, $course_id ) ) {
-    //                 $wpdb->insert(
-    //                     $wpdb->prefix . 'moodle_enrollment',
-    //                     array(
-    //                         'user_id'   => $user_id,
-    //                         'course_id' => $course_id,
-    //                         'role_id'   => $role_id,
-    //                         'time'      => date( 'Y-m-d H:i:s' ),
-    //                     ),
-    //                     array(
-    //                         '%d',
-    //                         '%d',
-    //                         '%d',
-    //                         '%s',
-    //                     )
-    //                 );
-    //             }
-    //         }
-    //     }
-
-    //     /**
-    //      * hook to execute custom function on user course enrollment update.
-    //      * $courses is passed as argument containing courses for which user is enrolled.
-    //      * response is passed to know if request is successful or not
-    //      */
-    //     do_action( 'eb_user_courses_updated', $user_id, $response['success'], $courses );
-    //
-    //     return $response['success'];
-    // }
-
-    /**
-     * Used to enroll user to course(s)
-     * Enrolls user to course on moodle on course purchase as well as update enrollment data on WordPress
-     *
      * @param array   $args arguments array
      *
      * @param boolean false
@@ -188,6 +92,7 @@ class EB_Enrollment_Manager {
         // default args
         $defaults = array(
             'user_id'   => 0,
+            'role_id'   => 5,
             'courses'   => array(),
             'unenroll'  => 0,
             'suspend'   => 0
@@ -208,8 +113,6 @@ class EB_Enrollment_Manager {
             return;
         }
 
-        EB()->logger()->add( 'user', 'Starting to update course access....' ); // add user log
-
         // get moodle course id of each course
         // we are fetching course id  of each course as on moodle, to send enrollment request on moodle.
         $moodle_courses = array_map( array( EB()->course_manager(), 'get_moodle_course_id' ), $args['courses'] );
@@ -220,7 +123,7 @@ class EB_Enrollment_Manager {
         EB()->logger()->add( 'user', "\n" ); // add user log
 
         $enrolments = array();
-        $role_id = 5; // the role id 5 denotes student role on moodle
+        $role_id = $args['role_id']; // the role id 5 denotes student role on moodle
 
         // define moodle webservice function to use
         if ( $args['unenroll'] == 0 ) {
@@ -251,16 +154,16 @@ class EB_Enrollment_Manager {
         $request_data      = array( 'enrolments' => $enrolments );
         $response          = EB()->connection_helper()->connect_moodle_with_args_helper( $webservice_function, $request_data );
         
-        EB()->logger()->add( 'user', "\n Enrollment response: ".serialize( $response ) ); // add user log
-
         // update enrollment details on wordpress enrollment table
         if ( $response['success'] ) {
 
             // define args
             $args = array(
                 'user_id'   => $args['user_id'],
+                'role_id'   => $args['role_id'],
                 'courses'   => $args['courses'],
-                'unenroll'  => $args['unenroll']
+                'unenroll'  => $args['unenroll'],
+                'suspend'  	=> $args['suspend']
             );
 
             $this->update_enrollment_record_wordpress( $args );
@@ -276,12 +179,66 @@ class EB_Enrollment_Manager {
         return $response['success'];
     }
 
+	/**
+     * We have to update our enrollment table on wordpress everytime a user is enrolled
+     * or unenrolled from moodle.
+     *
+     * @since  1.0.0
+     * @m
+     * @param array   $args arguments array
+     * @return boolean  true
+     */
+    public function update_enrollment_record_wordpress( $args ) {
+
+        global $wpdb;
+
+        // default args
+        $defaults = array(
+            'user_id'   => 0,
+            'role_id'   => 5,
+            'courses'   => array(),
+            'unenroll'  => 0,
+            'suspend'  	=> 0
+        );
+
+        /**
+         * Parse incoming $args into an array and merge it with $defaults
+         */
+        $args = wp_parse_args( $args, $defaults );
+        $role_id = $args['role_id']; // the role id 5 denotes student role on moodle
+
+        // add enrollment record in DB conditionally
+        // We are using user's wordpress ID and course's wordpress ID while saving record in enrollment table.
+        if ( $args['unenroll'] == 0 && $args['suspend'] == 0 ) {
+            foreach ( $args['courses'] as $key => $course_id ) {
+                if ( EB()->course_manager()->get_moodle_course_id( $course_id ) != '' && !$this->user_has_course_access( $args['user_id'], $course_id ) ) {
+                    $wpdb->insert(
+                        $wpdb->prefix . 'moodle_enrollment',
+                        array(
+                            'user_id'   => $args['user_id'],
+                            'course_id' => $course_id,
+                            'role_id'   => $role_id,
+                            'time'      => date( 'Y-m-d H:i:s' )
+                        ),
+                        array(
+                            '%d',
+                            '%d',
+                            '%d',
+                            '%s'
+                        )
+                    );
+                }
+            }
+        } elseif ( $args['unenroll'] == 1 || $args['suspend'] == 1 ) {
+
+            foreach ( $args['courses'] as $key => $course_id ) {
+				$this->delete_user_enrollment_record( $args['user_id'], $course_id );
+            }
+        }
+    }
 
     /**
      * Right now executes on user course synchronization action.
-     *
-     * Moodle does not have a webservice to unenroll user from course,
-     * so we can't unenroll a user from course from wordpress.
      *
      * This function just removes enrollment entry from enrollment table on wordpress,
      * only if a user has been unenrolled from a course on moodle
@@ -303,72 +260,11 @@ class EB_Enrollment_Manager {
     }
 
     /**
-     * We have to update our enrollment table on wordpress everytime a user is enrolled
-     * or unenrolled from moodle.
-     *
-     * @since  1.0.0
-     * @param array   $args arguments array
-     * @return boolean  true
-     */
-    public function update_enrollment_record_wordpress( $args ) {
-
-        global $wpdb;
-
-        // default args
-        $defaults = array(
-            'user_id'   => 0,
-            'courses'   => array(),
-            'unenroll'  => 0
-        );
-
-        /**
-         * Parse incoming $args into an array and merge it with $defaults
-         */
-        $args = wp_parse_args( $args, $defaults );
-        $role_id = 5; // the role id 5 denotes student role on moodle
-
-        // add enrollment record in DB conditionally
-        // We are using user's wordpress ID and course's wordpress ID while saving record in enrollment table.
-        if ( $args['unenroll'] == 0 ) {
-            foreach ( $args['courses'] as $key => $course_id ) {
-                if ( EB()->course_manager()->get_moodle_course_id( $course_id ) != '' && !$this->user_has_course_access( $args['user_id'], $course_id ) ) {
-                    $wpdb->insert(
-                        $wpdb->prefix . 'moodle_enrollment',
-                        array(
-                            'user_id'   => $args['user_id'],
-                            'course_id' => $course_id,
-                            'role_id'   => $role_id,
-                            'time'      => date( 'Y-m-d H:i:s' )
-                        ),
-                        array(
-                            '%d',
-                            '%d',
-                            '%d',
-                            '%s'
-                        )
-                    );
-                }
-            }
-        } elseif ( $args['unenroll'] == 1 ) {
-
-            foreach ( $args['courses'] as $key => $course_id ) {
-
-                // removing user enrolled courses from plugin db
-                $deleted = $wpdb->delete( $wpdb->prefix.'moodle_enrollment' , array( 'user_id' => $args['user_id'], 'course_id' => $course_id ), array( '%d', '%d' ) );
-
-                if ( $deleted ) {
-                    EB()->logger()->add( 'user', "Unenrolled user: {$args['user_id']} from course {$course_id}" );  // add user log
-                }
-            }
-        }
-    }
-
-    /**
      * used to check if a user has access to a course
      *
      * @since  1.0.0
-     * @param int     $user_id   WordPress user id of a user
-     * @param int     $course_id WordPress course id of a course
+     * @param  int     $user_id   WordPress user id of a user
+     * @param  int     $course_id WordPress course id of a course
      * @return boolean  true / false
      */
     public function user_has_course_access( $user_id, $course_id ) {
@@ -376,7 +272,6 @@ class EB_Enrollment_Manager {
         $has_access = false;
 
         if ( $user_id == '' || $course_id == '' ) {
-            EB()->logger()->add( 'user', "User ID or Course ID is not defined, Exiting!!!!" );
             return $has_access;
         }
 

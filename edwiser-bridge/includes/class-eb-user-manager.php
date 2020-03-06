@@ -110,8 +110,6 @@ class EB_User_Manager {
 		global $wpdb;
 		// $response_array['process_completed'] = 0;
 
-		EB()->logger()->add( 'user', "Initiating user data sync process...." ); //add to log
-
 		// checking if moodle connection is working properly
 		$connected = EB()->connection_helper()->connection_test_helper( EB_ACCESS_URL, EB_ACCESS_TOKEN );
 
@@ -125,8 +123,6 @@ class EB_User_Manager {
 			} else {
 				$all_users = $wpdb->get_results( "SELECT user_id, meta_value AS moodle_user_id FROM {$wpdb->prefix}usermeta WHERE meta_key = 'moodle_user_id' AND meta_value IS NOT NULL", ARRAY_A );
 			}
-
-			EB()->logger()->add( 'user', 'Users ids with moodle account ids:'.serialize( $all_users ) ); //add to log
 
 			// get courses of each user having a moodle a/c assosiated
 			foreach ( $all_users as $key => $value ) {
@@ -152,7 +148,6 @@ class EB_User_Manager {
 								// add enrolled courses id in array
 								$enrolled_courses[] = $existing_course_id;
 
-								EB()->logger()->add( 'user', 'Enrolling users to courses if course enrollment done from moodle....' );
 								// define args
 								$args = array(
 									'user_id'   => $value['user_id'],
@@ -356,8 +351,6 @@ class EB_User_Manager {
 		$request_data = array( 'field' => 'username', 'values' => array( $username ) );
 		$response     = EB()->connection_helper()->connect_moodle_with_args_helper( $webservice_function, $request_data );
 
-		EB()->logger()->add( 'user', 'Username exists response: '.serialize( $response ) ); // add to user log
-
 		// return true only if username is available
 		if ( $response['success'] == 1 && empty( $response['response_data'] ) ) {
 			return true;
@@ -384,15 +377,12 @@ class EB_User_Manager {
 		$webservice_function = 'core_user_get_users_by_field';
 
 		if ( !is_email( $user_email ) ) {
-			EB()->logger()->add( 'user', "Email is incorrect: {$email} Exiting!!!" );
 			return $user;
 		}
 
 		// prepare request data array
 		$request_data = array( 'field' => 'email', 'values' => array( $user_email ) );
 		$response     = EB()->connection_helper()->connect_moodle_with_args_helper( $webservice_function, $request_data );
-
-		EB()->logger()->add( 'user', 'User exists response: '.serialize( $response ) );
 
 		// create response array based on response recieved from api helper class
 		if ( $response['success'] == 1 && empty( $response['response_data'] ) ) {
@@ -743,7 +733,7 @@ class EB_User_Manager {
 
 		$moodle_user = $this->create_moodle_user( $user_data, 1 );
 		if ( isset( $moodle_user['user_updated'] ) && $moodle_user['user_updated'] == 1 ) {
-			EB()->logger()->add( 'user', 'Password updated successfully on moodle.' ); // add user log
+			//EB()->logger()->add( 'user', 'Password updated successfully on moodle.' ); // add user log
 		} else {
 			EB()->logger()->add( 'user', 'There is a problem in updating password..... Exiting!!!' ); // add user log
 		}
@@ -758,12 +748,9 @@ class EB_User_Manager {
 	 */
 	function password_reset( $user, $pass ) {
 
-		EB()->logger()->add( 'user', 'Password reset initiated..... ' ); // add user log
-
 		$moodle_user_id = get_user_meta( $user->ID, 'moodle_user_id', true ); // get moodle user id
 
 		if ( !is_numeric( $moodle_user_id ) ) {
-			EB()->logger()->add( 'user', 'A moodle user id is not associated.... Exiting!!!' ); // add user log
 			return;
 		}
 
@@ -779,7 +766,7 @@ class EB_User_Manager {
 
 			$moodle_user = $this->create_moodle_user( $user_data, 1 );
 			if ( isset( $moodle_user['user_updated'] ) && $moodle_user['user_updated'] == 1 ) {
-				EB()->logger()->add( 'user', 'Password reset successfully on moodle.' ); // add user log
+				//EB()->logger()->add( 'user', 'Password reset successfully on moodle.' ); // add user log
 			} else {
 				EB()->logger()->add( 'user', 'There is a problem in resetting password..... Exiting!!!' ); // add user log
 			}

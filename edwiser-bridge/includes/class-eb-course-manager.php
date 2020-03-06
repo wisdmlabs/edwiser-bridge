@@ -115,9 +115,7 @@ class EB_Course_Manager {
 
 				// creating categories based on recieved data
 				if ( $moodle_category_response['success'] == 1 ) {
-					EB()->logger()->add( 'course', 'Creating course categories....' );
 					$this->create_course_categories_on_wordpress( $moodle_category_response['response_data'] );
-					EB()->logger()->add( 'course', 'Categories created....' );
 				}
 
 				// push category response in array
@@ -137,8 +135,6 @@ class EB_Course_Manager {
 					/**
 					 * moodle always returns moodle frontpage as first course,
 					 * below step is to avoid the frontpage to be added as a course.
-					 *
-					 * @var [type]
 					 */
 					if ( $course_data->id == 1 ) {
 						continue;
@@ -149,18 +145,10 @@ class EB_Course_Manager {
 
 					// creates new course or updates previously synced course conditionally
 					if ( !is_numeric( $existing_course_id ) ) {
-						EB()->logger()->add( 'course', 'Creating a new course....' );  // add course log
-
 						$course_id         = $this->create_course_on_wordpress( $course_data, $sync_options );
 						$courses_created[] = $course_id; // push course id in courses created array
-
-						EB()->logger()->add( 'course', 'Course created, ID is: '.$course_id ); // add course log
 					} elseif ( is_numeric( $existing_course_id ) && isset( $sync_options['eb_synchronize_previous'] ) && $sync_options['eb_synchronize_previous'] == 1 ) {
-						EB()->logger()->add( 'course', 'Updating existing course: ID is: '.$existing_course_id );  // add course log
-
 						$course_id         = $this->update_course_on_wordpress( $existing_course_id, $course_data, $sync_options );
-						EB()->logger()->add( 'course', 'Updated course....' );  // add course log
-
 						$courses_updated[] = $course_id; // push course id in courses updated array
 					}
 				}
@@ -196,8 +184,6 @@ class EB_Course_Manager {
 
 		if ( !empty( $moodle_user_id ) ) { // get courses of a user
 
-			EB()->logger()->add( 'course', "\n Fetching user courses from moodle.... \n" ); // add course log
-
 			$webservice_function = 'core_enrol_get_users_courses'; // get a users enrolled courses from moodle
 			$request_data        = array( 'userid' => $moodle_user_id ); // prepare request data array
 
@@ -206,12 +192,10 @@ class EB_Course_Manager {
 			EB()->logger()->add( 'course', "User course response: ".serialize( $response ) ); // add course log
 		} elseif ( empty( $moodle_user_id ) ) { // get overall courses
 
-			EB()->logger()->add( 'course', "\n Fetching courses from moodle.... \n" ); // add course log
-
 			$webservice_function = 'core_course_get_courses'; // get all courses from moodle
 			$response            = EB()->connection_helper()->connect_moodle_helper( $webservice_function );
 
-			//EB()->logger()->add( 'course', "Response: ".serialize( $response ) ); // add course log
+			EB()->logger()->add( 'course', "Response: ".serialize( $response ) ); // add course log
 		}
 
 		return $response;
@@ -243,12 +227,9 @@ class EB_Course_Manager {
 	public function is_course_presynced( $course_id_on_moodle ) {
 
 		global $wpdb;
-		EB()->logger()->add( 'course', 'Checking if a course is presynced, Moodle ID of course: '.$course_id_on_moodle ); // add course log
-
+		
 		//get id of course on wordpress based on id on moodle $course_id =
 		$course_id = $wpdb->get_var( "SELECT post_id FROM {$wpdb->prefix}postmeta WHERE meta_key = 'moodle_course_id' AND meta_value = '" . $course_id_on_moodle . "'" );
-
-		EB()->logger()->add( 'course', 'Course Found? :'.( ( $course_id )? "Yes, the ID is: ".$course_id:"NO" ) ); // add course log
 
 		return $course_id;
 	}
@@ -352,8 +333,6 @@ class EB_Course_Manager {
 		if ( get_post_type( $course_id ) == "eb_course" ) {
 			// removing course from enrollment table
 			$wpdb->delete( $wpdb->prefix.'moodle_enrollment' , array( 'course_id' => $course_id ), array( '%d' ) );
-
-			EB()->logger()->add( 'course', "Course: {$course_id} is deleted. Enrollment records removed for the course." );  // add course log
 		}
 	}
 
