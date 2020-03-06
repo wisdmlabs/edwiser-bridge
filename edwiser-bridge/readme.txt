@@ -177,7 +177,17 @@ No, this is not possible using Edwiser Bridge.
 Take a look at the link below to see the full list of questions which will help you around the Edwiser Bridge plugin. 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
- ==  Changelog  == 
+ ==  Changelog  ==
+= 1.3.3 =
+* Feature - Added optional terms and conditions on user account page depending on the backend setting.
+* Tweak- Added user meta data related to the edwiser-bridge while exporting the users data.
+* Tweak- Added functionality to remove user meta data related to the edwiser-bridge while erasing the users data.
+* Tweak- Added privacy policy data on the wordpress privacy policy page.
+
+
+= 1.3.2 =
+* Tweak - Added missing JS and CSS Files.
+
 = 1.3.1 =
 * Feature - Added New Order functionality.
 * Feature - Added admin notice on the backend to rate Edwiser Bridge Plugin.

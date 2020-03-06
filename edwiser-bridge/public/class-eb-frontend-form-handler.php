@@ -100,6 +100,14 @@ class EbFrontendFormHandler
      */
     public static function processRegistration()
     {
+
+        $generalSettings = get_option("eb_general");
+        if (isset($generalSettings['eb_enable_terms_and_cond']) && $generalSettings['eb_enable_terms_and_cond'] == "yes") {
+            if (isset($_POST['reg_terms_and_cond']) && $_POST['reg_terms_and_cond'] != "on") {
+                return;
+            }
+        }
+
         if (!empty($_POST['register']) &&
                 isset($_POST['_wpnonce']) &&
                 wp_verify_nonce($_POST['_wpnonce'], 'eb-register')) {
