@@ -1,6 +1,8 @@
 <?php
 
-/**
+namespace app\wisdmlabs\edwiserBridge;
+
+/*
  * The plugin bootstrap file
  *
  *
@@ -12,7 +14,7 @@
  * Plugin Name:       Edwiser Bridge - WordPress Moodle LMS Integration
  * Plugin URI:        https://edwiser.org/bridge/
  * Description:       Edwiser Bridge integrates WordPress with the Moodle LMS. The plugin provides an easy option to import Moodle courses to WordPress and sell them using PayPal. The plugin also allows automatic registration of WordPress users on the Moodle website along with single login credentials for both the systems.
- * Version:           1.0.2
+ * Version:           1.1
  * Author:            WisdmLabs
  * Author URI:        https://edwiser.org
  * License:           GPL-2.0+
@@ -22,66 +24,107 @@
  */
 
 // If this file is called directly, abort.
-if ( !defined( 'WPINC' ) ) {
-	die;
+if (!defined('WPINC')) {
+    die;
 }
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-eb-activator.php
+ * This action is documented in includes/class-eb-activator.php.
  */
-function activate_edwiserbridge() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-eb-activator.php';
-	EB_Activator::activate();
+function activateEdwiserBridge()
+{
+    require_once plugin_dir_path(__FILE__).'includes/class-eb-activator.php';
+    EBActivator::activate();
 }
-register_activation_hook( __FILE__, 'activate_edwiserbridge' );
+register_activation_hook(__FILE__, 'app\wisdmlabs\edwiserBridge\activateEdwiserBridge');
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-eb-deactivator.php
+ * This action is documented in includes/class-eb-deactivator.php.
  */
-function deactivate_edwiserbridge() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-eb-deactivator.php';
-	EB_Deactivator::deactivate();
+function deactivateEdwiserBridge()
+{
+    require_once plugin_dir_path(__FILE__).'includes/class-eb-deactivator.php';
+    EBDeactivator::deactivate();
 }
-register_deactivation_hook( __FILE__, 'deactivate_edwiserbridge' );
+register_deactivation_hook(__FILE__, 'app\wisdmlabs\edwiserBridge\deactivateEdwiserBridge');
 
-/**
+/*
  * Applied to the list of links to display on the plugins page (beside the activate/deactivate links).
  *
  * A nes link is added that takes user to plugin settings.
  */
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'wdm_add_settings_action_link' );
-function wdm_add_settings_action_link( $links ) {
-	$pluginlinks = array(
-		'<a href="' . admin_url( '/admin.php?page=eb-settings' ) . '">Settings</a>'
-		//'<a href="https://edwiser.org/bridge/documentation/" target="_blank">Documentation</a>',
-	);
-	return array_merge( $links, $pluginlinks );
+add_filter('plugin_action_links_'.plugin_basename(__FILE__), 'app\wisdmlabs\edwiserBridge\wdmAddSettingsActionLink');
+function wdmAddSettingsActionLink($links)
+{
+    $pluginlinks = array(
+        '<a href="'.admin_url('/admin.php?page=eb-settings').'">Settings</a>',
+        //'<a href="https://edwiser.org/bridge/documentation/" target="_blank">Documentation</a>',
+    );
+
+    return array_merge($links, $pluginlinks);
+}
+
+/*
+ * Show row meta on the plugin screen, custom docs link added.
+ */
+add_filter('plugin_row_meta', 'app\wisdmlabs\edwiserBridge\wdmPluginRowMeta', 10, 2);
+function wdmPluginRowMeta($links, $file)
+{
+    if ($file == plugin_basename(__FILE__)) {
+        $row_meta = array(
+            'docs' => '<a href="https://edwiser.org/bridge/documentation/" target="_blank"
+                        title="'.esc_attr(__('Edwiser Bridge Documentation', 'eb-textdomain')).'">'.
+                        __('Documentation', 'eb-textdomain').
+                        '</a>',
+        );
+
+        return array_merge($links, $row_meta);
+    }
+
+    return (array) $links;
 }
 
 /**
- * Show row meta on the plugin screen, custom docs link added.
+ * Always show warning if legacy extensions are active
+ *
+ * @since 1.1
  */
-add_filter( 'plugin_row_meta', 'wdm_plugin_row_meta', 10, 2 );
-function wdm_plugin_row_meta( $links, $file ) {
+add_action('admin_init', 'app\wisdmlabs\edwiserBridge\wdmShowLegacyExtensions');
+function wdmShowLegacyExtensions()
+{
+    // prepare extensions array
+    $extensions = array(
+            'selective_sync' => array('selective-synchronization/selective-synchronization.php', '1.0.0'),
+            'woocommerce_integration' => array('woocommerce-integration/bridge-woocommerce.php', '1.0.4'),
+            'single_signon'  => array('edwiser-bridge-sso/sso.php', '1.0.0')
+    );
 
-	if ( $file == plugin_basename( __FILE__ ) ) {
-		$row_meta = array(
-			'docs'    => '<a href="https://edwiser.org/bridge/documentation/" target="_blank" title="' . esc_attr( __( 'Edwiser Bridge Documentation', 'eb-textdomain' ) ) . '">' . __( 'Documentation', 'eb-textdomain' ) . '</a>',
-		);
+    // legacy extensions
+    foreach ($extensions as $extension) {
+        if (is_plugin_active($extension[0])) {
+            $plugin_data = get_plugin_data(WP_PLUGIN_DIR . '/' . $extension[0]);
 
-		return array_merge( $links, $row_meta );
-	}
+            if (isset($plugin_data['Version'])) {
+                if (version_compare($plugin_data['Version'], $extension[1]) <= 0) {
+                    add_action('admin_notices', 'app\wisdmlabs\edwiserBridge\wdmShowLegacyExtensionsNotices');
+                }
+            }
+        }
+    }
+}
 
-	return (array) $links;
+function wdmShowLegacyExtensionsNotices()
+{
+    echo "<div class='error'><p>".__('Please update all <strong>Edwiser Bridge</strong> extensions to latest version.', 'edw_woo')."</p></div>";
 }
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/class-eb.php';
+require plugin_dir_path(__FILE__).'includes/class-eb.php';
 
 /**
  * Begins execution of the plugin.
@@ -92,8 +135,8 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-eb.php';
  *
  * @since    1.0.0
  */
-
-function run_edwiserbridge() {
-	EB()->run();
+function runEdwiserBridge()
+{
+    edwiserBridgeInstance()->run();
 }
-run_edwiserbridge(); // start plugin execution
+runEdwiserBridge(); // start plugin execution
