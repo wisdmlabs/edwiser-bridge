@@ -1,5 +1,4 @@
 <?php
-
 namespace app\wisdmlabs\edwiserBridge;
 
 /*
@@ -49,6 +48,8 @@ if (!class_exists('EbAdminSettings')) {
                 $settings[] = include 'settings/class-eb-settings-paypal.php';
                 self::$settings = apply_filters('eb_get_settings_pages', $settings);
                 $settings[] = include 'settings/class-eb-settings-licensing.php';
+                $settings[] = include 'settings/class-eb-settings-shortcode-doc.php';
+                $settings[] = include 'settings/class-eb-settings-premium-extensions.php';
             }
 
             return self::$settings;
@@ -361,9 +362,7 @@ if (!class_exists('EbAdminSettings')) {
                                     style="<?php echo esc_attr($value['css']); ?>"
                                     class="<?php echo esc_attr($value['class']); ?>"
                                     placeholder="<?php echo esc_attr($value['placeholder']); ?>"
-                                    <?php echo implode(' ', $custom_attributes); ?>>
-                                        <?php echo esc_textarea($option_value); ?>
-                                </textarea>
+                                    <?php echo implode(' ', $custom_attributes); ?>><?php echo esc_textarea($option_value); ?></textarea>
                             </td>
                         </tr>
                         <?php
@@ -417,7 +416,15 @@ if (!class_exists('EbAdminSettings')) {
                                     class="<?php echo esc_attr($value['class']); ?>"
                                     <?php echo implode(' ', $custom_attributes); ?>
                                     <?php echo ('multiselect' == $value['type']) ? 'multiple="multiple"' : ''; ?>>
-                                        <?php foreach ($value['options'] as $key => $val) { ?>
+                                        <?php
+                                        if (isset($value["default"]) && !empty($value["default"])) {
+                                            ?>
+                                            <option value=""> <?= $value["default"] ?></option>
+                                            <?php
+                                        }
+
+
+                                        foreach ($value['options'] as $key => $val) { ?>
                                         <option value="<?php echo esc_attr($key);
                                             ?>"
                                                 <?php
@@ -488,7 +495,7 @@ if (!class_exists('EbAdminSettings')) {
                             $value['show_if_checked'] = false;
                         }
                         if ('yes' == $value['hide_if_checked'] || 'yes' == $value['show_if_checked']) {
-                            $visbility_class[] = 'hidden_option';
+                            $visbility_class[] = 'wdm_hidden_option';
                         }
                         if ('option' == $value['hide_if_checked']) {
                             $visbility_class[] = 'hide_options_if_checked';
@@ -607,9 +614,9 @@ if (!class_exists('EbAdminSettings')) {
 
                     // Single sidebar select
                     case 'courses_per_row':
-                        $selectedVal=self::getOption($value['id'], $current_tab);
-                        $selectedVal=  trim($selectedVal);
-                        $selectedVal=  empty($selectedVal)?"4":$selectedVal;
+                        $selectedVal = self::getOption($value['id'], $current_tab);
+                        $selectedVal = trim($selectedVal);
+                        $selectedVal = empty($selectedVal) ? "4" : $selectedVal;
                         $args = array(
                             'name' => $value['id'],
                             'id' => $value['id'],
@@ -802,7 +809,23 @@ if (!class_exists('EbAdminSettings')) {
                 $description = '<span class="load-response">
                                     <img src="'.EB_PLUGIN_URL.'images/loader.gif" height="20" width="20" />
                                 </span>
-                                <div class="response-box"></div>';
+                                <span class="response-box"></span>
+                                <span class="linkresponse-box"></span>
+                                <div id="unlinkerrorid-modal" class="unlinkerror-modal">
+                                  <div class="unlinkerror-modal-content">
+                                    <span class="unlinkerror-modal-close">&times;</span>
+                                    <table class="unlink-table">
+                                     <thead>
+                                        <tr>
+                                           <th>'.__("User ID", "eb-textdomain").'</th>
+                                           <th>'.__("Name", "eb-textdomain").'</th>
+                                        </tr>
+                                     </thead>
+                                     <tbody>
+                                     </tbody>
+                                  </table>
+                                  </div>
+                                 </div>';
             } elseif ($description) {
                 $description = '<span class="description">'.wp_kses_post($description).'</span>';
             }
@@ -825,8 +848,6 @@ if (!class_exists('EbAdminSettings')) {
                 'tooltip_html' => $tooltip_html,
             );
         }
-
     }
-
 }
 new EbAdminSettings();

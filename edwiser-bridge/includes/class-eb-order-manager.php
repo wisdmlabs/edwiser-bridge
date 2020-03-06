@@ -104,48 +104,6 @@ class EBOrderManager
         return $order_status;
     }
 
-    /**
-     * get details of an order by order id.
-     *
-     * @since  1.0.0
-     *
-     * @param int $order_id id of an order
-     *
-     * @return string order details
-     */
-    public function getOrderDetails($order_id)
-    {
-
-        //get order billing id & email
-        $order_data = get_post_meta($order_id, 'eb_order_options', true);
-
-        if (!is_array($order_data)) {
-            $order_data = array();
-        }
-
-        echo '<div>';
-        printf(__('Order #%s Details', 'eb-textdomain'), $order_id);
-        //echo '<h2>Order #'.$order_id.' Details</h2>';
-        foreach ($order_data as $key => $value) {
-            if ($key == 'buyer_id') {
-                echo '<br/><strong>' . __('Buyer ID: ', 'eb-textdomain') . '</strong>'.$value.'<br/>';
-            } elseif ($key == 'billing_email') {
-                echo '<strong>' . __('Billing Email: ', 'eb-textdomain') . '</strong>'.$value.'<br/>';
-            } else {
-                continue;
-            }
-        }
-        echo '</div>';
-
-        //get ordered item id
-        $course_id = get_post_meta($order_id, 'course_id', true);
-        //return if order does not have an item(course) associated
-        if (!is_numeric($course_id)) {
-            return;
-        }
-
-        //return array( 'buyer_id' => $buyer_id, 'billing_email' => $billing_email, 'course_id' => $course_id );
-    }
 
     /**
      * update order status on saving an order from edit order page.
@@ -170,9 +128,34 @@ class EBOrderManager
         }
 
         if (!empty($post_options) && isset($post_options['order_status'])) {
-            $this->updateOrderStatus($order_id, $post_options['order_status']);
+            $this->updateOrderStatus($order_id, $post_options['order_status'], $post_options);
         }
+
+
+        // $this->updateOrderStatusForNewOrder($order_id, $post_options);
     }
+
+    /**
+     * update order status and all meta-data on new order creation.
+     *
+     * @since 1.3.1
+     *
+     * @param int $order_id     id of order
+     * @param int $order_status new status of order ( completed, pending or failed )
+     *
+     * @return bool
+     */
+    public function updateOrderStatusForNewOrder($order_id, $order_options)
+    {
+        $eb_order_options['buyer_id'] = $order_options['eb_order_username'];
+        $eb_order_options['order_status'] = $order_options['order_status'];
+        $eb_order_options['course_id'] = $order_options['eb_order_course'];
+        // $eb_order_options['creation_date'] = strtotime($order_options['eb_order_date']);
+
+        update_post_meta($order_id, 'eb_order_options', $eb_order_options);
+    }
+
+
 
     /**
      * Change status of an order.
@@ -184,9 +167,8 @@ class EBOrderManager
      *
      * @return bool
      */
-    public function updateOrderStatus($order_id, $order_status)
+    public function updateOrderStatus($order_id, $order_status, $post_options = array())
     {
-
         // get previous status
         $plugin_post_types = new EBPostTypes($this->plugin_name, $this->version);
         $previous_status = $plugin_post_types->getPostOptions($order_id, 'order_status', 'eb_order');
@@ -196,19 +178,37 @@ class EBOrderManager
 
             $order_options = get_post_meta($order_id, 'eb_order_options', true);
 
-            foreach ($order_options as $key => $option) {
-                $option;
-                if ($key == 'order_status') {
-                    $order_options[$key] = $order_status;
-                }
+            /**
+             * Unenroll the user if the order is get marked as pending or failed form the compleated.
+             */
+
+            if (isset($order_options['order_status']) && $order_options['order_status'] == "completed" && $order_status != "completed") {
+                $enrollmentManager = EBEnrollmentManager::instance($this->plugin_name, $this->version);
+                $ordDetail=get_post_meta($order_id, 'eb_order_options', true);
+                $args = array(
+                    'user_id' => $ordDetail['buyer_id'],
+                    'role_id' => 5,
+                    'courses' => array($order_options['course_id']),
+                    'unenroll' => 1,
+                    'suspend' => 0,
+                );
+                $enrollmentManager->updateUserCourseEnrollment($args);
             }
 
-            update_post_meta($order_id, 'eb_order_options', $order_options);
-            do_action('eb_order_status_'.$order_status, $order_id);
+            if (isset($order_options) && !empty($order_options)) {
+                foreach ($order_options as $key => $option) {
+                    $option;
+                    if ($key == 'order_status') {
+                        $order_options[$key] = $order_status;
+                    }
+                }
+                update_post_meta($order_id, 'eb_order_options', $order_options);
+            } else {
+                $this->updateOrderStatusForNewOrder($order_id, $post_options);
+            }
+            do_action('eb_order_status_' . $order_status, $order_id);
         }
-
-        edwiserBridgeInstance()->logger()->add('order', 'Order status updated, Status: '.$order_status); // add order log
-
+        edwiserBridgeInstance()->logger()->add('order', 'Order status updated, Status: ' . $order_status); // add order log
         return 1;
     }
 
@@ -235,6 +235,9 @@ class EBOrderManager
             $course_id = $order_data['course_id'];
         }
         $order_status = 'pending';
+        if (isset($order_data['order_status'])) {
+            $order_status = $order_data['order_status'];
+        }
 
         if (empty($buyer_id) || empty($course_id) || empty($order_status)) {
             return new \WP_Error('warning', __('Order details are not correct. Existing', 'eb-textdomain'));
@@ -261,18 +264,21 @@ class EBOrderManager
 
         if (!is_wp_error($order_id)) {
             //update order meta
+            $price= $this->getCoursePrice($course_id);
+            $price = apply_filters("eb_new_order_course_price", $price, $order_data);
             update_post_meta(
                 $order_id,
                 'eb_order_options',
                 array(
-                'order_status' => $order_status,
-                'buyer_id' => $buyer_id,
-                'course_id' => $course_id,
-                    )
+                    'order_status' => $order_status,
+                    'buyer_id' => $buyer_id,
+                    'course_id' => $course_id,
+                    'price' => $price,
+                )
             );
         }
 
-        edwiserBridgeInstance()->logger()->add('order', 'New order created, Order ID: '.$order_id); // add order log
+        edwiserBridgeInstance()->logger()->add('order', 'New order created, Order ID: ' . $order_id); // add order log
 
         /*
          * hooks to execute a function on new order creation
@@ -281,6 +287,24 @@ class EBOrderManager
         do_action('eb_order_created', $order_id);
 
         return $order_id;
+    }
+
+    /**
+     * Provides the functionality to get the courses price from course meta.
+     *
+     * @since 1.3.0
+     * @param type $courseId
+     * @return string returns the courses associated price.
+     */
+    private function getCoursePrice($courseId)
+    {
+        $courseMeta = get_post_meta($courseId, "eb_course_options", true);
+        $price="0.00";
+        $courseType= getArrValue($courseMeta, "course_price_type", false);
+        if ($courseType && $courseType=="paid") {
+            $price = getArrValue($courseMeta, "course_price", "0.00");
+        }
+        return $price;
     }
 
     /**
@@ -324,6 +348,19 @@ class EBOrderManager
             if (!is_wp_error($order_id_created)) {
                 $success = 1;
                 $order_id = $order_id_created;
+
+                /**
+                 * @since 1.2.4
+                 *update post meta if the sandbox is enabled for each order if the sandbox is enabled
+                 */
+                $options = get_option("eb_paypal");
+                if (isset($options["eb_paypal_sandbox"]) && $options["eb_paypal_sandbox"] == "yes") {
+                    update_post_meta($order_id, "eb_paypal_sandbox", "yes");
+                }
+
+                if (isset($options['eb_paypal_currency']) && !empty($options['eb_paypal_currency'])) {
+                    update_post_meta($order_id, 'eb_paypal_currency', $options['eb_paypal_currency']);
+                }
             }
         }
 
@@ -347,7 +384,6 @@ class EBOrderManager
      */
     public function enrollToCourseOnOrderComplete($order_id)
     {
-
         // get order options
         $order_options = get_post_meta($order_id, 'eb_order_options', true);
 
@@ -376,7 +412,6 @@ class EBOrderManager
         edwiserBridgeInstance()->userManager()->linkMoodleUser($buyer);
 
         //$course_meta = get_post_meta( $course_id, "eb_course_options", true );
-
         // define args
         $args = array(
             'user_id' => $buyer_id,
@@ -384,10 +419,6 @@ class EBOrderManager
         );
 
         $course_enrolled = edwiserBridgeInstance()->enrollmentManager()->updateUserCourseEnrollment($args); // enroll user to course
-        // $course_enrolled = edwiserBridgeInstance()->enrollment_manager()->update_user_course_enrollment(
-        //      $buyer_id,
-        //      array( $course_id )
-        // );
 
         return $course_enrolled;
     }
@@ -446,19 +477,18 @@ class EBOrderManager
 
             if (!$buyer) {
                 echo '-';
-
                 return;
             }
 
             $buyer_name = '';
             if (isset($buyer->first_name) && isset($buyer->last_name)) {
-                $buyer_name = $buyer->first_name.' '.$buyer->last_name;
+                $buyer_name = $buyer->first_name . ' ' . $buyer->last_name;
             }
 
             if ($buyer_name == '') {
                 $buyer_name = $buyer->user_login;
             }
-            echo "<a href='".get_edit_user_link($order_buyer_id)."'>".$buyer_name.'</a>';
+            echo "<a href='" . get_edit_user_link($order_buyer_id) . "'>" . $buyer_name . '</a>';
         }
     }
 }

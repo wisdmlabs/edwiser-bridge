@@ -135,40 +135,43 @@ class EBCourseManager
              */
             $moodle_course_resp = $this->getMoodleCourses(); // get courses from moodle
 
-            // creating courses based on recieved data
-            if ($moodle_course_resp['success'] == 1) {
-                foreach ($moodle_course_resp['response_data'] as $course_data) {
-                    /*
-                     * moodle always returns moodle frontpage as first course,
-                     * below step is to avoid the frontpage to be added as a course.
-                     */
-                    if ($course_data->id == 1) {
-                        continue;
-                    }
 
-                    // check if course is previously synced
-                    $existing_course_id = $this->isCoursePresynced($course_data->id);
 
-                    // creates new course or updates previously synced course conditionally
-                    if (!is_numeric($existing_course_id)) {
-                        $course_id = $this->createCourseOnWordpress($course_data, $sync_options);
-                        $courses_created[] = $course_id; // push course id in courses created array
-                    } elseif (is_numeric($existing_course_id) &&
-                            isset($sync_options['eb_synchronize_previous']) &&
-                            $sync_options['eb_synchronize_previous'] == 1) {
-                        $course_id = $this->updateCourseOnWordpress(
-                            $existing_course_id,
-                            $course_data,
-                            $sync_options
-                        );
-                        $courses_updated[] = $course_id; // push course id in courses updated array
+            if ((isset($sync_options["eb_synchronize_draft"])/* && $sync_options['eb_synchronize_draft'] == 1*/) || (isset($sync_options["eb_synchronize_previous"]) && $sync_options['eb_synchronize_previous'] == 1)) {
+                // creating courses based on recieved data
+                if ($moodle_course_resp['success'] == 1) {
+                    foreach ($moodle_course_resp['response_data'] as $course_data) {
+                        /*
+                         * moodle always returns moodle frontpage as first course,
+                         * below step is to avoid the frontpage to be added as a course.
+                         */
+                        if ($course_data->id == 1) {
+                            continue;
+                        }
+
+                        // check if course is previously synced
+                        $existing_course_id = $this->isCoursePresynced($course_data->id);
+
+                        // creates new course or updates previously synced course conditionally
+                        if (!is_numeric($existing_course_id) /*&& $sync_options["eb_synchronize_draft"]*/) {
+                            $course_id = $this->createCourseOnWordpress($course_data, $sync_options);
+                            $courses_created[] = $course_id; // push course id in courses created array
+                        } elseif (is_numeric($existing_course_id) &&
+                                isset($sync_options['eb_synchronize_previous']) &&
+                                $sync_options['eb_synchronize_previous'] == 1) {
+                            $course_id = $this->updateCourseOnWordpress(
+                                $existing_course_id,
+                                $course_data,
+                                $sync_options
+                            );
+                            $courses_updated[] = $course_id; // push course id in courses updated array
+                        }
                     }
                 }
+                $response_array['course_success'] = $moodle_course_resp['success'];
+                // push course response in array
+                $response_array['course_response_message'] = $moodle_course_resp['response_message'];
             }
-
-            // push course response in array
-            $response_array['course_success'] = $moodle_course_resp['success'];
-            $response_array['course_response_message'] = $moodle_course_resp['response_message'];
 
             /*
              * hook to be run on course completion
@@ -308,11 +311,19 @@ class EBCourseManager
         $wp_course_id = wp_insert_post($course_args); // create a course on wordpress
 
         // get term id on wordpress to which course is associated on moodle
-        $term_id = $wpdb->get_var(
+        /*$term_id = $wpdb->get_var(
             "SELECT term_id
             FROM {$wpdb->prefix}term_taxonomy
             WHERE taxonomy = 'eb_course_cat'
             AND description = ".$course_data->categoryid
+        );*/
+
+
+        $term_id = $wpdb->get_var(
+            "SELECT term_id
+            FROM {$wpdb->prefix}termmeta
+            WHERE meta_key = 'eb_moodle_cat_id'
+            AND meta_value = ".$course_data->categoryid
         );
 
         // $term_id = get_option( "eb_course_cat_".$course_data->categoryid );
@@ -359,11 +370,19 @@ class EBCourseManager
         wp_update_post($course_args);
 
         // get term id on wordpress to which course is associated on moodle
-        $term_id = $wpdb->get_var(
+        /*$term_id = $wpdb->get_var(
             "SELECT term_id
             FROM {$wpdb->prefix}term_taxonomy
             WHERE taxonomy = 'eb_course_cat'
             AND description = ".$course_data->categoryid
+        );*/
+
+
+        $term_id = $wpdb->get_var(
+            "SELECT term_id
+            FROM {$wpdb->prefix}termmeta
+            WHERE meta_key = 'eb_moodle_cat_id'
+            AND meta_value = ".$course_data->categoryid
         );
 
         // $term_id = get_option( "eb_course_cat_".$course_data->categoryid );
@@ -429,39 +448,47 @@ class EBCourseManager
 
             if ($parent > 0) {
                 // get parent term if exists
-                $parent_term = $wpdb->get_var(
+                /*$parent_term = $wpdb->get_var(
                     "SELECT term_id
                     FROM {$wpdb->prefix}term_taxonomy
                     WHERE taxonomy = 'eb_course_cat'
                     AND description = ".$category->parent
+                );*/
+
+                $parent_term = $wpdb->get_var(
+                    "SELECT term_id
+                    FROM {$wpdb->prefix}termmeta
+                    WHERE meta_key = 'eb_moodle_cat_id'
+                    AND meta_value = ".$category->parent
                 );
 
                 // $parent_term = get_option( "eb_course_cat_".$category->parent );
-
-                if ($parent_term && !term_exists($category->name, 'eb_course_cat', $parent_term)) {
+                if ($parent_term && !term_exists($cat_name_lower, 'eb_course_cat', $parent_term)) {
                     $created_term = wp_insert_term(
                         $category->name,
                         'eb_course_cat',
                         array(
                         'slug' => $cat_name_lower,
                         'parent' => $parent_term,
-                        'description' => $category->id,
-                            )
+                        'description' => $category->description,
+                        )
                     );
+                    update_term_meta($created_term['term_id'], "eb_moodle_cat_id", $category->id);
 
                     // Save the moodle id of category in options
                     // update_option( "eb_course_cat_".$category->id, $created_term['term_id'] );
                 }
             } else {
-                if (!term_exists($category->name, 'eb_course_cat')) {
+                if (!term_exists($cat_name_lower, 'eb_course_cat')) {
                     $created_term = wp_insert_term(
                         $category->name,
                         'eb_course_cat',
                         array(
                         'slug' => $cat_name_lower,
-                        'description' => $category->id,
+                        'description' => $category->description,
                             )
                     );
+                    update_term_meta($created_term['term_id'], "eb_moodle_cat_id", $category->id);
 
                     // Save the moodle id of category in options
                     // update_option( "eb_course_cat_".$category->id, $created_term['term_id'] );

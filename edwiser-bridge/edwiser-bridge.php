@@ -14,7 +14,7 @@ namespace app\wisdmlabs\edwiserBridge;
  * Plugin Name:       Edwiser Bridge - WordPress Moodle LMS Integration
  * Plugin URI:        https://edwiser.org/bridge/
  * Description:       Edwiser Bridge integrates WordPress with the Moodle LMS. The plugin provides an easy option to import Moodle courses to WordPress and sell them using PayPal. The plugin also allows automatic registration of WordPress users on the Moodle website along with single login credentials for both the systems.
- * Version:           1.2.1
+ * Version:           1.4.3
  * Author:            WisdmLabs
  * Author URI:        https://edwiser.org
  * License:           GPL-2.0+
@@ -32,6 +32,16 @@ if (!defined('WPINC')) {
  * The code that runs during plugin activation.
  * This action is documented in includes/class-eb-activator.php.
  */
+
+if (!defined("EB_BASE_FILE_NAME")) {
+    define("EB_BASE_FILE_NAME", basename(__FILE__));
+}
+
+if (!defined("EB_PLUGIN_NAME")) {
+    define("EB_PLUGIN_NAME", basename(dirname(__FILE__)));
+}
+
+
 function activateEdwiserBridge($netWide)
 {
     require_once plugin_dir_path(__FILE__).'includes/class-eb-activator.php';
@@ -90,6 +100,8 @@ function wdmPluginRowMeta($links, $file)
     return (array) $links;
 }
 
+
+
 /*
  * Always show warning if legacy extensions are active
  *
@@ -129,7 +141,7 @@ function wdmShowLegacyExtensionsNotices()
             <?php
             printf(
                 __('Please update all %s extensions to latest version.', 'eb-textdomain'),
-                '<strong>' . __('Edwiser Bridge', 'eb-textdomain') . '</strong>'
+                '<strong>'.__('Edwiser Bridge', 'eb-textdomain').'</strong>'
             );
             ?>
         </p>
@@ -150,7 +162,7 @@ require plugin_dir_path(__FILE__).'includes/class-eb.php';
 add_action('admin_init', 'app\wisdmlabs\edwiserBridge\processUpgrade');
 function processUpgrade()
 {
-    $newVersion = '1.2.1';
+    $newVersion = '1.4.3';
     $currentVersion = get_option('eb_current_version');
     if ($currentVersion == false || $currentVersion != $newVersion) {
         require_once plugin_dir_path(__FILE__).'includes/class-eb-activator.php';
@@ -174,4 +186,6 @@ function runEdwiserBridge()
 }
 
 runEdwiserBridge(); // start plugin execution
+
+require_once plugin_dir_path(__FILE__).'includes/api/class-eb-external-api.php';
 

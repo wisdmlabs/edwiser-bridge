@@ -29,10 +29,10 @@
      * be doing this, we should try to minimize doing that in our own work.
      */
 
-/**
- * Provides the functionality to place the new order on click of the Take this course button.
- */
-    function placeOrder() {
+    /**
+     * Provides the functionality to place the new order on click of the Take this course button.
+     */
+    function placeOrder(formSubmit) {
         var course_id = $("input[name='item_number']").val();
         var order_id = '';
         var buyer_id = $("input[name='custom']").val();
@@ -50,7 +50,6 @@
                 '_wpnonce_field': eb_public_js_object.nonce,
             },
             success: function (response) {
-
                 //prepare response for user
                 if (response.success == 1) {
                     //create custom data encoded in json
@@ -58,6 +57,17 @@
                     custom_data['order_id'] = parseInt(response.order_id);
 
                     $("input[name='custom']").val(JSON.stringify(custom_data));
+
+                    /*
+                     *---------------------------------------
+                     *Added code to solve payment pending issue
+                     * -------------------------------------
+                     */
+                    // submitting form if the submit form is on.
+                    // added button click event on class as there are 2 payment forms in the single course page with 2 submit buttons with same id.
+                    if (formSubmit) {
+                        $(".eb-paid-course").click();
+                    }
                 } else {
                     e.preventDefault();
                     alert(eb_public_js_object.msg_ordr_pro_err);
@@ -65,8 +75,60 @@
             }
         });
     }
-    
+
     $(window).load(function () {
+
+
+        function getUrlParameter(sParam)
+        {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                    sURLVariables = sPageURL.split('&'),
+                    sParameterName,
+                    i;
+
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
+
+
+
+
+        if (getUrlParameter("auto_enroll") === "true") {
+
+            $.blockUI({
+                message: eb_public_js_object.msg_processing
+            });
+            var btn = document.getElementById('eb_course_payment_button');
+            if (btn == null) {
+                btn = document.getElementById('wdm-btn');
+                if (btn.text != eb_public_js_object.access_course) {
+                    btn.click();
+                } else {
+                    $.unblockUI();
+                }
+            } else {
+
+
+                /*
+                 * ---------------------------------
+                 * Commented the btn.click() to solve pending payment issue.
+                 * --------------------------------
+                 */
+                /*btn.click();*/
+                placeOrder(1);
+            }
+        }
+
+
+
+
+
+
 
         /* Change required fields error messages for login / register page */
         var intputElements = document.getElementsByTagName("INPUT");
@@ -93,9 +155,9 @@
             "iDisplayLength": 10,
             "order": [[1, "desc"]],
             "columnDefs": [{
-                "targets": 'no-sort',
-                "orderable": true,
-            }],
+                    "targets": 'no-sort',
+                    "orderable": true,
+                }],
             language: {
                 search: ebDataTable.search,
                 sEmptyTable: ebDataTable.sEmptyTable,
@@ -134,15 +196,66 @@
          * add the newly created order it in form to be sent to paypal.
          *
          */
-        $('#eb_course_payment_button').click(function (e) {
-            placeOrder();            
+        $('.eb-paid-course').click(function (e) {
+            placeOrder(0);
         });
     });
 
 
 
     $(document).ready(function () {
-        function getUrlParameter(sParam)
+
+        if ($("#reg_terms_and_cond").length) {
+            $("input[name='register']").prop('disabled', true);
+            $("input[name='register']").css("cursor", "no-drop");
+            $("#reg_terms_and_cond").change(function() {
+                if(this.checked) {
+                    $("input[name='register']").prop('disabled', false);
+                    $("input[name='register']").css("cursor", "pointer");
+                } else {
+                    $("input[name='register']").prop('disabled', true);
+                    $("input[name='register']").css("cursor", "no-drop");
+                }
+            });
+        }
+
+
+
+
+        $('#eb_terms_cond_check').click(function(){
+            var checkbox = $(this).parent().parent();
+            checkbox = checkbox.find("input[name='reg_terms_and_cond']");
+            $('#eb-user-account-terms-content').dialog({
+                modal: true,
+                resizable: true,
+                width: 500,
+                dialogClass: 'eb_admin_terms_dialog',
+                buttons: [
+                    {
+                        text: "Agree",
+                        "class": 'eb_terms_button_agree',
+                        click: function() {
+                            checkbox.prop('checked', true);
+                            $(this).dialog("close");
+                        }
+                    },
+                    {
+                        text: "Disagree",
+                        "class": 'eb_terms_button_disagree',
+                        click: function() {
+                            checkbox.prop('checked', false);
+                             $(this).dialog("close");
+                        }
+                    }
+                ],
+            });
+
+            // $('.eb-user-account-terms div').dialog();
+        });
+
+
+
+        /*function getUrlParameter(sParam)
         {
             var sPageURL = decodeURIComponent(window.location.search.substring(1)),
                     sURLVariables = sPageURL.split('&'),
@@ -156,8 +269,8 @@
                     return sParameterName[1] === undefined ? true : sParameterName[1];
                 }
             }
-        };
-        if (getUrlParameter("auto_enroll") === "true") {
+        };*/
+        /*if (getUrlParameter("auto_enroll") === "true") {
             $.blockUI({
                 message: eb_public_js_object.msg_processing
             });
@@ -173,8 +286,58 @@
                 btn.click();
                 placeOrder();
             }
-        }
+        }*/
+
+        /**
+         * Scroll left
+         */
+        $(".eb-scroll-left").on("click", function (event) {
+            event.preventDefault();
+            var parent = $(this).parents(".eb-cat-courses-cont");
+            var newScrollLeft = parent.scrollLeft();
+            var width = parent.width();
+            var scrollWidth = parent.get(0).scrollWidth;
+            var scrollOffcet = width / 2;
+
+            parent.animate({scrollLeft: parent.scrollLeft() - scrollOffcet}, "fast");
+            if (newScrollLeft <= 0 + scrollOffcet) {
+                $(this).hide();
+            }
+            if (scrollWidth >= newScrollLeft) {
+                parent.children(".eb-scroll-right").show()
+            }
+        });
+
+        /**
+         * Scroll right
+         */
+        $(".eb-scroll-right").on("click", function (event) {
+            event.preventDefault();
+            var parent = $(this).parents(".eb-cat-courses-cont");
+            var newScrollLeft = parent.scrollLeft();
+            var width = parent.width();
+            var scrollWidth = parent.get(0).scrollWidth;
+            var scrollOffcet = width / 2;
+            $(parent).children(".eb-scroll-left").show();
+            parent.animate({scrollLeft: parent.scrollLeft() + scrollOffcet}, "fast");
+            if (scrollWidth <= newScrollLeft + width + scrollOffcet) {
+                $(this).hide();
+            }
+            if (newScrollLeft <= 0) {
+                parent.children(".eb-scroll-left").show()
+            }
+        });
+
+        $(".eb-cat-courses-cont").each(function () {
+            var documentScrollLeft = jQuery(".eb-cat-courses-cont").scrollLeft();
+            var lastScrollLeft = 0;
+            var width = $(this).width();
+            var scrollWidth = $(this).get(0).scrollWidth;
+            if (scrollWidth <= width) {
+                lastScrollLeft = documentScrollLeft;
+                $(this).children(".eb-scroll-right").hide();
+            }
+            $(this).children(".eb-scroll-left").hide();
+        });
     });
-
-
 })(jQuery);

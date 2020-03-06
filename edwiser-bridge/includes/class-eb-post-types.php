@@ -166,7 +166,7 @@ class EBPostTypes
                             'public' => false,
                             'capability_type' => 'post',
                             'capabilities' => array(
-                            'create_posts' => false,
+                            'create_posts' => true,
                             ),
                             'map_meta_cap' => true,
                             'show_ui' => true,
@@ -205,10 +205,23 @@ class EBPostTypes
             array('post_type' => 'eb_course')
         );
 
+
+        //register metabox for recommended course section on single course page.
+        add_meta_box(
+            'eb_recommended_course_options',
+            __('Recommended Course Settings', 'eb-textdomain'),
+            array($this, 'postOptionsCallback'),
+            'eb_course',
+            'advanced',
+            'default',
+            array('post_type' => 'eb_course')
+        );
+
+
         //register metabox for moodle Order post type options
         add_meta_box(
             'eb_order_options',
-            __('Order Options', 'eb-textdomain'),
+            __('Order Details', 'eb-textdomain'),
             array($this, 'postOptionsCallback'),
             'eb_order',
             'advanced',
@@ -231,13 +244,24 @@ class EBPostTypes
     {
         $post;
         // get fields for a specific post type
-        $fields = $this->populateMetaboxFields($args['args']['post_type']);
 
-        echo "<div id='{$args['args']['post_type']}_options' class='post-options'>";
+        if ($args['id'] == "eb_recommended_course_options") {
+            $fields = $this->populateMetaboxFields($args['id']);
+        } else {
+            $fields = $this->populateMetaboxFields($args['args']['post_type']);
+        }
 
-        // display content before order options, only if post type is moodle order.
+
+        $cssClass = "";
+        echo "<div>";
         if ($args['args']['post_type'] == 'eb_order') {
-            edwiserBridgeInstance()->orderManager()->getOrderDetails(get_the_id());
+            $cssClass = "eb-wdm-order-meta";
+            echo "<strong>";
+            printf(__('Order #%s Details', 'eb-textdomain'), get_the_id());
+            echo "</strong>";
+            echo "<div id='{$args['args']['post_type']}_options' class='post-options " . $cssClass . "'>";
+        } else {
+            echo "<div id='{$args['args']['post_type']}_options' class='post-options'>";
         }
 
         // render fields using our renderMetaboxFields() function
@@ -249,6 +273,13 @@ class EBPostTypes
             );
             $this->renderMetaboxFields($field_args);
         }
+        // display content before order options, only if post type is moodle order.
+        if ($args['args']['post_type'] == 'eb_order') {
+            $orderMeta=new EBOrderMeta($this->plugin_name, $this->version);
+            $orderMeta->getOrderDetails(get_the_id());
+        }
+        echo "</div>";
+        do_action("eb_post_add_meta", $args);
         echo '</div>';
     }
 
@@ -263,6 +294,7 @@ class EBPostTypes
      */
     private function populateMetaboxFields($post_type)
     {
+        global $post;
         $args_array = array(
             'eb_course' => array(
                 'moodle_course_id' => array(
@@ -317,6 +349,29 @@ class EBPostTypes
                     'type' => 'textarea',
                     'placeholder' => __('', 'eb-textdomain'),
                     'default' => '',
+                )
+            ),
+            'eb_recommended_course_options' => array(
+                'enable_recmnd_courses' => array(
+                    'label' => __('Show Recommended Courses', 'eb-textdomain'),
+                    'description' => __('Show recommended courses on single course page.', 'eb-textdomain'),
+                    'default' => 'no',
+                    'type' => 'checkbox',
+                    'autoload' => false,
+                ),
+                'show_default_recmnd_course' => array(
+                    'label' => __('Show Category Wise Recommended Courses', 'eb-textdomain'),
+                    'description' => __('Show category wise selected recommended courses on single course page.', 'eb-textdomain'),
+                    'default' => 'no',
+                    'type' => 'checkbox',
+                    'autoload' => false,
+                ),
+                'enable_recmnd_courses_single_course' => array(
+                    'label' => __('Select Courses', 'eb-textdomain'),
+                    'description' => __('Select courses to show in custom courses in recommended course section.', 'eb-textdomain'),
+                    'type' => 'select_multi',
+                    'options' => isset($post->ID) ? getAllEbSourses($post->ID) : array(),
+                    'default' => array('pending'),
                 ),
             ),
             'eb_order' => array(
@@ -328,6 +383,7 @@ class EBPostTypes
                         'pending' => __('Pending', 'eb-textdomain'),
                         'completed' => __('Completed', 'eb-textdomain'),
                         'failed' => __('Failed', 'eb-textdomain'),
+                        'refunded' => __('Refunded', 'eb-textdomain'),
                     ),
                     'default' => array('pending'),
                 ),
@@ -369,9 +425,9 @@ class EBPostTypes
         } elseif (isset($field['default'])) {
             $data = $field['default'];
         }
-        $field['placeholder'] = '';
-        if (isset($field['placeholder'])) {
-            $field['placeholder'] = $field['placeholder'];
+
+        if (!isset($field['placeholder'])) {
+            $field['placeholder'] = "";
         }
         $label = '';
         if (isset($field['label'])) {
@@ -391,12 +447,16 @@ class EBPostTypes
                   <div class='eb-option-div'>";
 
         switch ($field['type']) {
+            case 'title':
+                $html .= '<h2 id="'.esc_attr($field_id).'" />'.$field['label'].'</h2>';
+                break;
             case 'label':
                 $html .= '<span id="'.esc_attr($field_id).'" /><b>'.$data.'</b></span>'."\n";
                 break;
             case 'text':
             case 'password':
             case 'number':
+            case 'date':
                 $html .= '<input id="'.esc_attr($field_id);
                 $html .= '" type="'.$field['type'];
                 $html .= '" name="'.esc_attr($option_name);
@@ -505,6 +565,8 @@ class EBPostTypes
      */
     public function handlePostOptionsSave($post_id)
     {
+        $fields = array();
+
         if (empty($_POST)) {
             return false;
         }
@@ -521,7 +583,10 @@ class EBPostTypes
         if (!in_array($post_type, array('eb_course', 'eb_order'))) {
             return;
         } else {
-            $fields = $this->populateMetaboxFields($post_type);
+            if ($post_type == "eb_course") {
+                $fields = $this->populateMetaboxFields($post_type);
+                $fields = array_merge($this->populateMetaboxFields("eb_recommended_course_options"), $fields);
+            }
             $post_options = array();
             if (isset($_POST[$post_type.'_options'])) {
                 $post_options = $_POST[$post_type.'_options'];
@@ -654,32 +719,6 @@ class EBPostTypes
         return $messages;
     }
 
-    /**
-     * Used to get postmeta values by meta key.
-     *
-     * @since     1.0.0
-     *
-     * @param string $post_type post id
-     * @param string $post_type post type for which data is fetched
-     * @param string $key       name of custom field for which value is fetched
-     * @param bool   $default   default value in case key is not set
-     *
-     * @return string value of custom field
-     */
-    // public static function getPostOptions( $post_id, $key, $post_type = false, $default = false ){
-    //     if ( empty( $key ) ) {
-    //         return $default;
-    //     }
-    //     if(!$post_type){
-    //         $options = get_post_meta( $post_id, $key, true );
-    //         $value = (!empty($options))?$options:$default;
-    //         return $value;
-    //     } else {
-    //         $options = get_post_meta( $post_id, '_'.$post_type.'_options', true );
-    //         $value = isset( $options[ $key ] ) ? $options[ $key ] : $default;
-    //         return $value;
-    //     }
-    // }
     public static function getPostOptions($post_id, $key, $post_type, $default = false)
     {
         if (empty($key)) {

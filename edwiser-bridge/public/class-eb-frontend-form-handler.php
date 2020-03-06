@@ -100,6 +100,13 @@ class EbFrontendFormHandler
      */
     public static function processRegistration()
     {
+        $generalSettings = get_option("eb_general");
+        if (isset($generalSettings['eb_enable_terms_and_cond']) && $generalSettings['eb_enable_terms_and_cond'] == "yes") {
+            if (isset($_POST['reg_terms_and_cond']) && $_POST['reg_terms_and_cond'] != "on") {
+                return;
+            }
+        }
+
         if (!empty($_POST['register']) &&
                 isset($_POST['_wpnonce']) &&
                 wp_verify_nonce($_POST['_wpnonce'], 'eb-register')) {
@@ -132,11 +139,16 @@ class EbFrontendFormHandler
                     throw new \Exception(__('Anti-spam field was filled in.', 'eb-textdomain'));
                 }
 
-                $new_user = $user_manager->createWordpressUser(sanitize_email($email), $firstname, $lastname);
+                //added afyter
+                $role = defaultRegistrationRole();
+
+                $new_user = $user_manager->createWordpressUser(sanitize_email($email), $firstname, $lastname, $role);
 
                 if (is_wp_error($new_user)) {
                     throw new \Exception($new_user->get_error_message());
                 }
+
+                //add role code here
 
                 $user_manager->setUserAuthCookie($new_user);
 
@@ -155,6 +167,27 @@ class EbFrontendFormHandler
             }
         }
     }
+
+
+
+    /**
+     * Default role set to the user on registration from user-account page
+     * @return [type] [description]
+     */
+    /*public static function defaultRegistrationRole()
+    {
+        $role = "";
+        $ebOptions = get_option("eb_general");
+        if (isset($ebOptions["eb_default_role"]) && !empty($ebOptions["eb_default_role"])) {
+            $role = apply_filters("eb_registration_role", $ebOptions["eb_default_role"]);
+        }
+        return $role;
+    }*/
+
+
+
+
+
 
     /**
      * process course join for free courses.
@@ -209,6 +242,10 @@ class EbFrontendFormHandler
             /* enroll user to course */
             //$course_enrolled =
             edwiserBridgeInstance()->enrollmentManager()->updateUserCourseEnrollment($args);
+            $edwiser=EdwiserBridge::instance();
+            $orderManager=EBOrderManager::instance($edwiser->getPluginName(), $edwiser->getVersion());
+            $orderData = array('buyer_id'=>$user_id,'course_id'=>$course_id,'order_status'=>'completed');
+            $orderManager->createNewOrder($orderData);
         }
     }
 

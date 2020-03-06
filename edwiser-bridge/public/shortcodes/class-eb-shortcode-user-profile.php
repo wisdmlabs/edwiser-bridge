@@ -126,16 +126,15 @@ class EbShortcodeUserProfile
 
             if ($user->ID > 0) {
                 if (isset($_SESSION['eb_msgs_'.$current_user->ID])) {
-                    session_unset($_SESSION['eb_msgs_'.$current_user->ID]);
+                    unset($_SESSION['eb_msgs_'.$current_user->ID]);
                 }
                 $posted_data = self::getPostedData();
-                //error_log(print_r($posted_data, true));
                 $errors = self::getErrors($posted_data);
 
                 if (count($errors)) {
                     $_SESSION['eb_msgs_'.$user->ID] = '<p class="eb-error">' . implode("<br />", $errors) . '</p>';
                 } else {
-                    // Profile updated on Moodle sucessfully.
+                    // Profile updated on Moodle successfully.
                     if (self::updateMoodleProfile($posted_data)) {
                         self::updateWordPressProfile($posted_data);
 
@@ -237,7 +236,6 @@ class EbShortcodeUserProfile
         if (is_numeric($mdl_uid)) {
             $user_data = array(
                 'id'            => (int)$mdl_uid,
-                // 'username'      => $username,
                 'email'         => $posted_data['email'],
                 'firstname'     => $posted_data['first_name'],
                 'lastname'      => $posted_data['last_name'],
@@ -251,7 +249,7 @@ class EbShortcodeUserProfile
             if (isset($posted_data['pass_1']) && ! empty($posted_data['pass_1'])) {
                 $user_data['password'] = $posted_data['pass_1'];
             }
-
+            $user_data=  apply_filters("eb_update_moodle_profile_data", $user_data);
             $user_manager = new EBUserManager('edwiserbridge', EB_VERSION);
             $response = $user_manager->createMoodleUser($user_data, 1);
 
@@ -274,18 +272,16 @@ class EbShortcodeUserProfile
 
         $args = array(
             'ID'            => $user->ID,
-            // 'user_login'    => $username,
             'user_email'    => $posted_data['email'],
             'first_name'    => $posted_data['first_name'],
             'last_name'     => $posted_data['last_name'],
             'nickname'      => $posted_data['nickname'],
             'description'   => $posted_data['description']
         );
-
+        $args=  apply_filters("eb_wp_update_user_profile", $args);
         if (isset($posted_data['pass_1']) && ! empty($posted_data['pass_1'])) {
             $args['user_pass'] = $posted_data['pass_1'];
         }
-
         wp_update_user($args);
     }
 }
