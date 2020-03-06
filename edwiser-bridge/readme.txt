@@ -1,8 +1,9 @@
 === Edwiser Bridge - WordPress Moodle LMS Integration === 
 Contributors: WisdmLabs
-Tags: WordPress, Moodle, Courses, Users, Synchronization, Sell Courses, Learning Management System, LMS, LMS Integration, Moodle WordPress, WordPress Moodle, WP Moodle,
+Tags: Moodle, Courses, eLearning, WordPress Moodle, LMS, Users, Synchronization, Sell Courses, Learning Management System, LMS Integration, Moodle WordPress, WP Moodle,
+Requires PHP: 5.6
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 4.9.4
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -66,7 +67,21 @@ Edit the content in email templates sent out from the plugin to users who purcha
 A dedicated page which displays every user the list of courses they have purchased and based on their selection, recommends them other courses on offer.
 
 = Set course access expiry period =
-Set the course expiry date on course backend and upon course expire, users are automatically unenrolled from the course on WordPress and Moodle.
+Set the course expiry date on course backend and after course expire, users are automatically unenrolled from the course on WordPress and Moodle.
+
+= Refund Functionality =
+Now you can give refunds to your students/clients from the Orders section under Edwiser Bridge.
+As an admin, you can make sure that people other than you are notified whenever a refund is given.
+The student or client will be notified by email when the refund is given.
+Admin can also customize the email template sent to the student/client.
+
+= Order Status Update History =
+A new widget is added to the Orders edit page. It displays the full history of actions taken for that order.
+
+= User Account Page =
+We have improved the user account page.Now your buyers will get all the purchase & course related information in one place.
+They can also update their profile and change their account passwords.
+The passwords updated here will reflect on both the WordPress and Moodle sites.
 
  = Premium Extensions = 
 **WooCommerce Integration for Edwiser Bridge**
@@ -75,24 +90,35 @@ Want to use the power of WooCommerce to sell your Moodle courses from WordPress?
 
 <a href = "https://edwiser.org/bridge/extensions/woocommerce-integration/">WooCommerce Integration for Edwiser Bridge</a>
 
-**Single Sign On for Edwiser Bridge**
+**Single Sign-On for Edwiser Bridge**
 
-The Single Sign On extension for Edwiser Bridge facilitates simultaneous login to WordPress and Moodle by entering login credentials only once.
+The Single Sign-On extension for Edwiser Bridge facilitates simultaneous login to WordPress and Moodle by entering login credentials only once.
 
 <a href = "https://edwiser.org/bridge/extensions/single-sign-on/">Single Sign On for Edwiser Bridge</a>
 
 **Selective Synchronization for Edwiser Bridge**
 
-Selectively synchronize Moodle courses or courses belonging to a particular category using the Selective Syncronization extension for Edwiser Bridge.
+Selectively synchronize Moodle courses or courses belonging to a particular category using the Selective Synchronization extension for Edwiser Bridge.
 
 <a href = "https://edwiser.org/bridge/extensions/selective-synchronization/">Selective Synchronization for Edwiser Bridge</a>
 
+**Bulk Purchase for Edwiser Bridge**
+
+The Bulk Purchase plugin lets you buy more than one Moodle course through WooCommerce at one go and enroll each student in your class.
+
+<a href = "https://edwiser.org/bridge/extensions/bulk-purchase/">Bulk Purchase for Edwiser Bridge</a>
+
+**Edwiser RemUI Theme for Moodle**
+
+The world’s first User Centric theme for Moodle. Level Up your Moodle experience with Edwiser RemUI.
+
+<a href = "https://edwiser.org/remui/">Edwiser RemUI Theme for Moodle</a>
 
  ==  Installation  == 
 
  = Minimum Requirements = 
 * PHP version 5.6 or greater
-* WordPress 4.7 or higher
+* WordPress 4.9 or higher
 * Moodle 2.9 or higher
 
  =  Automatic Installation  = 
@@ -113,24 +139,28 @@ Take a look at the link below and follow the steps provided to configure your Mo
 
 
 == Screenshots == 
-1. General Settings for Edwiser Bridge
-2. Connection Settings for Edwiser Bridge
-3. Course Synchronization from Moodle to WordPress
-4. User Enrollment Data Synchronization
-5. Imported moodle courses in the WordPress Backend
+1. General Settings for Edwiser Bridge.
+2. Connection Settings for Edwiser Bridge.
+3. Course Synchronization from Moodle to WordPress.
+4. User Enrollment Data Synchronization.
+5. Imported moodle courses in the WordPress Backend.
 6. Order Details of Courses Purchased from WordPress
-7. User Profile Shortcode with List of Enrolled Courses
-8. Courses page Shortcode to display edwiser bridge courses.
-9. My Courses page Shortcode.
-10. Courses archive page template.
-11. Single course page template.
-12. A student can update their profile details from the frontend. 
-13. Setting to set the course access period of the enrolled user.
-14. Edit email notification template's content.
-15. Manage user enrollment.
-16. Edwiser Bridge Plugin shortcodes documentation.
-17. Courses page shortcode horizontally scrollable courses list.
-18. Display courses with category grouping using eb_courses page shortcode.
+7. Courses page Shortcode to display edwiser bridge courses.
+8. My Courses page Shortcode.
+9. Courses archive page template.
+10. Single course page template.
+11. Setting to set the course access duration.
+12. Edit email notification template's content.
+13. Manage user enrollment.
+14. Edwiser Bridge Plugin shortcodes documentation.
+15. Display courses with category grouping using eb_courses page shortcode.
+16. Notify your colleagues whenever a refund is given out.
+17. Order refund notification email template.
+18. Order Status History Widget. 
+19. Order refund meta box.
+20. Improved User Account page.
+21. Orders section part of user account.
+
 
 
  ==  Frequently Asked Questions  == 
@@ -148,22 +178,32 @@ Take a look at the link below to see the full list of questions which will help 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
  ==  Changelog  == 
-= 1.2.4 =
-* Feature - Added functionality to display multiple courses on user account page.
-* Feature - Added compatibility for woocommerce-integration to display orders on user account page.
+= 1.3.0 =
+* Feature - Refund functionality for the order placed using the Edwiser bridge plugin.
+* Feature - Email template for the admin and customer on order refund
+* Feature - Setting to send refund notification to the specific email or admin users email.
+* Feature - New order status(Refund).
+* Feature - New meta box on the eb order page to display the order status update history. On full refund Order status will change to the refunded.
+* Feature - Refurbished the user account page, added menus for the pages like Dashboard, user-account, orders, and my courses.
+* Twik - Now user can view there woo and eb orders on the same page.
+* Twik - To display multiple courses from the same order on the user order page.
+* Twik - For the security purpose, added password confirmation fields on the user account page.
+* Twik - Updated the eb-courses page sliding buttons.
+* Fix - The courses grid item height issue on my courses and courses page.
+* Fix - Fixed the 'TAKE THIS COURSE' button style issue.
 
 = 1.2.3 =
 * Feature - Functionality to display courses by category in eb_courses shortcode.
 * Feature - Functionality to display eb_courses shortcode output horizontally scrollable.
-* Feature - Functionality to display courses in single row using eb_courses shortcode.
+* Feature - Functionality to display courses in a single row using eb_courses shortcode.
 * Feature - SSO compatibility to login user on registration after clicking on enrolled course.
 
 = 1.2.2 =
 * Feature - New page for the admin to manage user enrollment.
-* Feature - New email template for the moodle account creation.
+* Feature - New email template for the Moodle account creation.
 * Feature - Functionality to disable email notifications.
 * Feature - Functionality to place the order for the free course to maintain the purchase history.
-* Tweak- Added the order and Buyer details in order page.
+* Tweak- Added the order and Buyer details on order page.
 * Tweak- User gets un-enroll from the course on the order status marked from completed to pending or failed.
 * Tweak- Updated the user order details on the user account page and added the order status column.
 * Fix - User not getting created on moodle when username contains the uppercase characters.
