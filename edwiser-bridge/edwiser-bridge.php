@@ -5,7 +5,6 @@ namespace app\wisdmlabs\edwiserBridge;
 /*
  * The plugin bootstrap file
  *
- *
  * @link    https://edwiser.org
  * @since   1.0.0
  * @package Edwiser Bridge
