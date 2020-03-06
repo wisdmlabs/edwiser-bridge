@@ -2,7 +2,7 @@
 Contributors: WisdmLabs
 Tags: WordPress, Moodle, Courses, Users, Synchronization, Sell Courses, Learning Management System, LMS, LMS Integration, Moodle WordPress, WordPress Moodle, WP Moodle,
 Requires at least: 4.0
-Tested up to: 4.7
+Tested up to: 4.8
 Stable tag: trunk
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -120,15 +120,18 @@ Take a look at the link below and follow the steps provided to configure your Mo
 5. Imported moodle courses in the WordPress Backend
 6. Order Details of Courses Purchased from WordPress
 7. User Profile Shortcode with List of Enrolled Courses
-8. Courses page Shortcode.
+8. Courses page Shortcode to display edwiser bridge courses.
 9. My Courses page Shortcode.
-10. Redirect the user to the My Courses page on login/registration from the User Account page.
-11. Setting to manage 'Max number of courses in the row' for the Courses page template.
-12. Single course page template.
-13. A student can update their profile details from the frontend. 
-14. Setting to set the course access period of the enrolled user.
-15. Edit email notification template's content.
-16. Manage user enrollment.
+10. Courses archive page template.
+11. Single course page template.
+12. A student can update their profile details from the frontend. 
+13. Setting to set the course access period of the enrolled user.
+14. Edit email notification template's content.
+15. Manage user enrollment.
+16. Edwiser Bridge Plugin shortcodes documentation.
+17. Courses page shortcode horizontally scrollable courses list.
+18. Display courses with category grouping using eb_courses page shortcode.
+
 
  ==  Frequently Asked Questions  == 
 
@@ -145,6 +148,11 @@ Take a look at the link below to see the full list of questions which will help 
 <a href = "https://edwiser.org/bridge/faqs/">Frequently Asked Questions for Edwiser Bridge</a>
 
  ==  Changelog  == 
+= 1.2.3 =
+* Feature - Functionality to display courses by category in eb_courses shortcode.
+* Feature - Functionality to display eb_courses shortcode output horizontally scrollable.
+* Feature - Functionality to display courses in single row using eb_courses shortcode.
+* Feature - SSO compatibility to login user on registration after clicking on enrolled course.
 
 = 1.2.2 =
 * Feature - New page for the admin to manage user enrollment.
