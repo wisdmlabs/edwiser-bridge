@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Template Loader
  *
@@ -10,193 +9,226 @@
  *
  * @package    Edwiser Bridge
  * @subpackage Edwiser Bridge/public
- * @author     WisdmLabs <support@wisdmlabs.com>
  */
 
 namespace app\wisdmlabs\edwiserBridge;
 
-class EbTemplateLoader
-{
+/**
+ * Class EbTemplateLoader.
+ */
+class EbTemplateLoader {
 
-    /**
-     * The ID of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string    $plugin_name    The ID of this plugin.
-     */
-    private $plugin_name;
 
-    /**
-     * The version of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string    $version    The current version of this plugin.
-     */
-    private $version;
+	/**
+	 * The ID of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @var      string    $plugin_name    The ID of this plugin.
+	 */
+	private $plugin_name;
 
-    /**
-     * Initialize the class and set its properties.
-     *
-     * @since 1.0.0
-     * @param string  $plugin_name The name of the plugin.
-     * @param string  $version     The version of this plugin.
-     */
-    public function __construct($plugin_name, $version)
-    {
-        $this->plugin_name = $plugin_name;
-        $this->version = $version;
-    }
+	/**
+	 * The version of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @var      string    $version    The current version of this plugin.
+	 */
+	private $version;
 
-    /**
-     * Load a template.
-     *
-     * Handles template usage so that we can use our own templates instead of the themes.
-     *
-     * Templates are in the 'templates' folder. edw looks for theme
-     * overrides in /theme/edw/ by default
-     *
-     * @since 1.0.0
-     * @param mixed   $template
-     * @return string
-     */
-    public function templateLoader($template)
-    {
-        $file = '';
+	/**
+	 * Initialize the class and set its properties.
+	 *
+	 * @since 1.0.0
+	 * @param string $plugin_name The name of the plugin.
+	 * @param string $version     The version of this plugin.
+	 */
+	public function __construct( $plugin_name, $version ) {
+		$this->plugin_name = $plugin_name;
+		$this->version     = $version;
+	}
 
-        if (is_single() && get_post_type() == 'eb_course') {
-            $file = 'single-eb_course.php';
-            $find[] = $file;
-            $find[] = EB_TEMPLATE_PATH.$file;
-        } elseif (is_post_type_archive('eb_course')) {
-            $file = 'archive-eb_course.php';
-            $find[] = $file;
-            $find[] = EB_TEMPLATE_PATH.$file;
-        }
+	/**
+	 * Load a template.
+	 *
+	 * Handles template usage so that we can use our own templates instead of the themes.
+	 *
+	 * Templates are in the 'templates' folder. edw looks for theme
+	 * overrides in /theme/edw/ by default
+	 *
+	 * @since 1.0.0
+	 * @param mixed $template temp.
+	 * @return string
+	 */
+	public function template_loader( $template ) {
+		$file          = '';
+		$eb_templ_path = \app\wisdmlabs\edwiserBridge\wdm_edwiser_bridge_plugin_template_path();
 
-        if ($file) {
-            $template = locate_template(array_unique($find));
-            if (!$template) {
-                $template = EB_PLUGIN_DIR.'public/templates/'.$file;
-            }
-        }
+		if ( is_single() && get_post_type() === 'eb_course' ) {
+			$file   = 'single-eb_course.php';
+			$find[] = $file;
+			$find[] = $eb_templ_path . $file;
+		} elseif ( is_post_type_archive( 'eb_course' ) ) {
+			$file   = 'archive-eb_course.php';
+			$find[] = $file;
+			$find[] = $eb_templ_path . $file;
+		}
 
-        return $template;
-    }
+		if ( $file ) {
+			$template = locate_template( array_unique( $find ) );
+			if ( ! $template ) {
+				// $template = EB_PLUGIN_DIR . 'public/templates/' . $file;
+				$template = require_once ABSPATH . 'wp-content/plugins/edwiser-bridge/public/templates/' . $file;
+			}
+		}
 
-    /**
-     * Get template part (for templates like the shop-loop).
-     *
-     * @since  1.0.0
-     * @access public
-     * @param mixed   $slug
-     * @param string  $name (default: '')
-     * @return void
-     */
-    public function wpGetTemplatePart($slug, $name = '')
-    {
-        $template = '';
+		return $template;
+	}
 
-        // Look in yourtheme/edw/slug-name.php
-        if ($name) {
-            $template = locate_template(array("{$slug}-{$name}.php", EB_TEMPLATE_PATH."{$slug}-{$name}.php"));
-        }
 
-        // Get default slug-name.php
-        if (!$template && $name && file_exists(EB_PLUGIN_DIR."public/templates/{$slug}-{$name}.php")) {
-            $template = EB_PLUGIN_DIR."public/templates/{$slug}-{$name}.php";
-        }
+	/**
+	 * DEPRECATED FUNCTION.
+	 *
+	 * Get template part (for templates like the shop-loop).
+	 *
+	 * @deprecated since 2.0.1 use wp_get_template_part( $slug, $name )
+	 * @since  1.0.0
+	 * @param mixed  $slug slug.
+	 * @param string $name (default: '').
+	 * @return void
+	 */
+	public function wpGetTemplatePart( $slug, $name = '' ) {
+		$this->wp_get_template_part( $slug, $name );
+	}
 
-        // If template file doesn't exist, look in yourtheme/edw/slug.php
-        if (!$template) {
-            $template = locate_template(array("{$slug}.php", EB_TEMPLATE_PATH."{$slug}.php"));
-        }
+	/**
+	 * Get template part (for templates like the shop-loop).
+	 *
+	 * @since  1.0.0
+	 * @param mixed  $slug slug.
+	 * @param string $name (default: '').
+	 * @return void
+	 */
+	public function wp_get_template_part( $slug, $name = '' ) {
+		$template      = '';
+		$eb_templ_path = \app\wisdmlabs\edwiserBridge\wdm_edwiser_bridge_plugin_template_path();
 
-        // Allow 3rd party plugin filter template file from their plugin
-        if ((!$template) || $template) {
-            $template = apply_filters('eb_get_template_part', $template, $slug, $name);
-        }
+		// Look in yourtheme/edw/slug-name.php.
+		if ( $name ) {
+			$template = locate_template( array( "{$slug}-{$name}.php", $eb_templ_path . "{$slug}-{$name}.php" ) );
+		}
 
-        if ($template) {
-            load_template($template, false);
-        }
-    }
+		// Get default slug-name.php.
+		if ( ! $template && $name && file_exists( ABSPATH . "wp-content/plugins/edwiser-bridge/public/templates/{$slug}-{$name}.php" ) ) {
+			$template = ABSPATH . "wp-content/plugins/edwiser-bridge/public/templates/{$slug}-{$name}.php";
+		}
 
-    /**
-     * Get other templates.
-     *
-     * @since  1.0.0
-     * @access public
-     * @param string  $template_name
-     * @param array   $args          (default: array())
-     * @param string  $template_path (default: '')
-     * @param string  $default_path  (default: '')
-     * @return void
-     */
-    public function wpGetTemplate($template_name, $args = array(), $template_path = '', $default_path = '')
-    {
-        if ($args && is_array($args)) {
-            extract($args);
-        }
+		// If template file doesn't exist, look in yourtheme/edw/slug.php.
+		if ( ! $template ) {
+			$template = locate_template( array( "{$slug}.php", $eb_templ_path . "{$slug}.php" ) );
+		}
 
-        $located = $this->wpLocateTemplate($template_name, $template_path, $default_path);
+		// Allow 3rd party plugin filter template file from their plugin.
+		if ( ( ! $template ) || $template ) {
+			$template = apply_filters( 'eb_get_template_part', $template, $slug, $name );
+		}
 
-        if (!file_exists($located)) {
-            _doing_it_wrong(__FUNCTION__, sprintf(__('%s does not exist.', 'eb-textdomain'), '<code>' . $located . '</code>'), '2.1');
-            return;
-        }
+		if ( $template ) {
+			load_template( $template, false );
+		}
+	}
 
-        // Allow 3rd party plugin filter template file from their plugin
-        $located = apply_filters('eb_get_template', $located, $template_name, $args, $template_path, $default_path);
 
-        do_action('eb_before_template_part', $template_name, $template_path, $located, $args);
+	/**
+	 * DEPRECATED FUNCTION
+	 *
+	 * Get other templates.
+	 *
+	 * @deprecated since 2.0.1 use wp_get_template( $template_name, $args, $template_path, $default_path ) insted.
+	 * @since  1.0.0
+	 * @param string $template_name nsme.
+	 * @param array  $args          (default: array()).
+	 * @param string $template_path (default: '').
+	 * @param string $default_path  (default: '').
+	 * @return void
+	 */
+	public function wpGetTemplate( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
+		$this->wp_get_template( $template_name, $args, $template_path, $default_path );
+	}
 
-        include $located;
+	/**
+	 * Get other templates.
+	 *
+	 * @since  1.0.0
+	 * @param string $template_name name.
+	 * @param array  $args          (default: array()).
+	 * @param string $template_path (default: '').
+	 * @param string $default_path  (default: '').
+	 * @return void
+	 */
+	public function wp_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
+		if ( $args && is_array( $args ) ) {
+			extract( $args );
+		}
 
-        do_action('eb_after_template_part', $template_name, $template_path, $located, $args);
-    }
+		$located = $this->wp_locate_template( $template_name, $template_path, $default_path );
 
-    /**
-     * Locate a template and return the path for inclusion.
-     *
-     * This is the load order:
-     *
-     *  yourtheme  / $template_path / $template_name
-     *  yourtheme  / $template_name
-     *  $default_path / $template_name
-     *
-     * @since  1.0.0
-     * @access public
-     * @param string  $template_name
-     * @param string  $template_path (default: '')
-     * @param string  $default_path  (default: '')
-     * @return string
-     */
-    public function wpLocateTemplate($template_name, $template_path = '', $default_path = '')
-    {
-        if (!$template_path) {
-            $template_path = EB_TEMPLATE_PATH;
-        }
+		if ( ! file_exists( $located ) ) {
+			/* Translators 1: file path */
+			_doing_it_wrong( __FUNCTION__, sprintf( esc_html__( '%$1s', 'eb-textdomain' ) . ' does not exist.', '<code>' . esc_html( $located ) . '</code>' ), '2.1' );
+			return;
+		}
 
-        if (!$default_path) {
-            $default_path = EB_PLUGIN_DIR.'public/templates/';
-        }
+		// Allow 3rd party plugin filter template file from their plugin.
+		$located = apply_filters( 'eb_get_template', $located, $template_name, $args, $template_path, $default_path );
 
-        // Look within passed path within the theme - this is priority
-        $template = locate_template(
-            array(
-                    trailingslashit($template_path).$template_name,
-                    $template_name
-                )
-        );
+		do_action( 'eb_before_template_part', $template_name, $template_path, $located, $args );
 
-        // Get default template
-        if (!$template) {
-            $template = $default_path.$template_name;
-        }
+		include $located;
 
-        // Return what we found
-        return apply_filters('eb_locate_template', $template, $template_name, $template_path);
-    }
+		do_action( 'eb_after_template_part', $template_name, $template_path, $located, $args );
+	}
+
+	/**
+	 * Locate a template and return the path for inclusion.
+	 *
+	 * This is the load order:
+	 *
+	 *  yourtheme  / $template_path / $template_name
+	 *  yourtheme  / $template_name
+	 *  $default_path / $template_name
+	 *
+	 * @since  1.0.0
+	 * @param string $template_name name.
+	 * @param string $template_path (default: '').
+	 * @param string $default_path  (default: '').
+	 * @return string
+	 */
+	public function wp_locate_template( $template_name, $template_path = '', $default_path = '' ) {
+		$eb_plugin_dir        = \app\wisdmlabs\edwiserBridge\wdm_edwiser_bridge_plugin_dir();
+		$eb_plugin_templ_path = \app\wisdmlabs\edwiserBridge\wdm_edwiser_bridge_plugin_template_path();
+
+		if ( ! $template_path ) {
+			$template_path = $eb_plugin_templ_path;
+		}
+
+		if ( ! $default_path ) {
+			$default_path = $eb_plugin_dir . 'public/templates/';
+		}
+
+		// Look within passed path within the theme - this is priority.
+		$template = locate_template(
+			array(
+				trailingslashit( $template_path ) . $template_name,
+				$template_name,
+			)
+		);
+
+		// Get default template.
+		if ( ! $template ) {
+			$template = $default_path . $template_name;
+		}
+
+		// Return what we found.
+		return apply_filters( 'eb_locate_template', $template, $template_name, $template_path );
+	}
 }

@@ -1,37 +1,38 @@
 <?php
-
 /**
- * Sanitize a string destined to be a tooltip. Prevents XSS.
+ * Formatting FUnctions.
  *
- * @param string $var
+ * @link       https://edwiser.org
+ * @since      1.0.0
  *
- * @return string
+ * @package    Edwiser Bridge
  */
-function wpSanitizeTooltip($var)
-{
-    return wp_kses(
-        html_entity_decode($var),
-        array(
-        'br' => array(),
-        'em' => array(),
-        'strong' => array(),
-        'span' => array(),
-        'ul' => array(),
-        'li' => array(),
-        'ol' => array(),
-        'p' => array(),
-            )
-    );
+
+if ( ! function_exists( 'wpClean' ) ) {
+	/**
+	 * DEPRECATED FUNCTION.
+	 *
+	 * Clean variables.
+	 *
+	 * @deprecated since 2.0.1 use wp_clean() insted
+	 * @param string $var var.
+	 *
+	 * @return string
+	 */
+	function wpClean( $var ) {
+		return sanitize_text_field( $var );
+	}
 }
 
-/**
- * Clean variables.
- *
- * @param string $var
- *
- * @return string
- */
-function wpClean($var)
-{
-    return sanitize_text_field($var);
+if ( ! function_exists( 'wdm_edwiser_bridge_wp_clean' ) ) {
+	/**
+	 * Clean variables.
+	 *
+	 * @param string $var var.
+	 *
+	 * @return string
+	 */
+	function wdm_edwiser_bridge_wp_clean( $var ) {
+		return sanitize_text_field( $var );
+	}
 }

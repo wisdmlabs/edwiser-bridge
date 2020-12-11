@@ -1,45 +1,45 @@
 <?php
-
-namespace app\wisdmlabs\edwiserBridge;
-
-/*
- * EDW EbAdminMarketingAdd Class.
+/**
+ * EDW Eb_Admin_Marketing_Add Class.
  *
  * @since      1.2.0
  *
  * @package    Edwiser Bridge
  * @subpackage Edwiser Bridge/admin
- * @author     WisdmLabs <support@wisdmlabs.com>
  */
 
-if (!defined('ABSPATH')) {
-    exit; // Exit if accessed directly
+namespace app\wisdmlabs\edwiserBridge;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
 }
 
-if (!class_exists('EbAdminMarketingAdd')) {
+if ( ! class_exists( 'Eb_Admin_Marketing_Add' ) ) {
 
-    /**
-     * EbAdminSettings.
-     */
-    class EbAdminMarketingAdd
-    {
+	/**
+	 * EbAdminSettings.
+	 */
+	class Eb_Admin_Marketing_Add {
+		/**
+		 * Constructor.
+		 */
+		public function __construct() {
+			add_action( 'eb_settings_footer', array( $this, 'output' ) );
+		}
 
-        public function __construct()
-        {
-            add_action("eb_settings_header", array($this, "outPut"));
-        }
-
-        public function outPut()
-        {
-            ?>
-            <div class='eb-marketing-add'>
-                <a target="_blank" href='https://edwiser.org/remui/?utm_source=InProduct&utm_medium=banner&utm_campaign=Bridge&utm_term=Apr'>
-                    <img alt="<?php __('Sorry, Unable to load image', 'eb-textdomain') ?>" src="<?php echo plugins_url("edwiser-bridge/admin/assets/images/rem-ui.jpg"); ?>">
-                </a>
-            </div>
-            <?php
-        }
-    }
+		/**
+		 * Output marketing banner.
+		 */
+		public function output() {
+			?>
+			<div class='eb-marketing-add'>
+				<a target="_blank" href='https://edwiser.org/bridge/extensions/edwiser-bundle/'>
+					<img alt="<?php __( 'Sorry, Unable to load image', 'eb-textdomain' ); ?>" src="<?php echo esc_url( plugins_url( 'edwiser-bridge/admin/assets/images/rem-ui.png' ) ); ?>">
+				</a>
+			</div>
+			<?php
+		}
+	}
 }
-new EbAdminMarketingAdd();
+new Eb_Admin_Marketing_Add();
 
