@@ -128,7 +128,7 @@ class Eb_Paypal_Refund_Manager {
 				'VERSION'       => '84.0',
 				'SIGNATURE'     => $api_details['sign'],
 				'USER'          => $api_details['username'],
-				'PWD'           => $api_details['password'],
+				'PWD'           => $api_details['pwd'],
 				'METHOD'        => 'RefundTransaction',
 				'TRANSACTIONID' => $txn_id,
 				'NOTE'          => $reason,
@@ -151,7 +151,7 @@ class Eb_Paypal_Refund_Manager {
 		$api_details  = get_option( 'eb_paypal' );
 		$pay_pal_data = array(
 			'username' => \app\wisdmlabs\edwiserBridge\wdm_eb_get_value_from_array( $api_details, 'eb_api_username', '' ),
-			'password' => \app\wisdmlabs\edwiserBridge\wdm_eb_get_value_from_array( $api_details, 'eb_api_password', '' ),
+			'pwd'      => \app\wisdmlabs\edwiserBridge\wdm_eb_get_value_from_array( $api_details, 'eb_api_password', '' ),
 			'sign'     => \app\wisdmlabs\edwiserBridge\wdm_eb_get_value_from_array( $api_details, 'eb_api_signature', '' ),
 		);
 		return $pay_pal_data;
@@ -178,7 +178,19 @@ class Eb_Paypal_Refund_Manager {
 	private function get_currency_code( $order_id ) {
 		$currency_code = get_post_meta( $order_id, 'eb_paypal_currency', 1 );
 		if ( ! $currency_code && empty( $currency_code ) ) {
-			$option = unserialize( get_option( 'eb_paypal' ) );
+			$default_options = array(
+				'eb_paypal_email'        => '',
+				'eb_paypal_currency'     => '',
+				'eb_paypal_country_code' => '',
+				'eb_paypal_cancel_url'   => '',
+				'eb_paypal_return_url'   => '',
+				'eb_paypal_notify_url'   => '',
+				'eb_paypal_sandbox'      => '',
+				'eb_api_username'        => '',
+				'eb_api_password'        => '',
+				'eb_api_signature'       => '',
+			);
+			$option          = unserialize( get_option( 'eb_paypal' ), $default_options );
 			return $option['eb_paypal_currency'];
 		}
 		return $currency_code;
@@ -190,7 +202,7 @@ class Eb_Paypal_Refund_Manager {
 	 * @param int $currency currency.
 	 */
 	private function currency_has_decimals( $currency ) {
-		if ( in_array( $currency, array( 'HUF', 'JPY', 'TWD' ), 1 ) ) {
+		if ( in_array( $currency, array( 'HUF', 'JPY', 'TWD' ), true ) ) {
 			return false;
 		}
 		return true;

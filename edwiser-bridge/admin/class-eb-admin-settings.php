@@ -616,7 +616,10 @@ if ( ! class_exists( 'EbAdminSettings' ) ) {
 							<td class="forminp">
 								<select name="<?php echo esc_attr( $value['id'] ); ?>" id="<?php echo esc_attr( $value['id'] ); ?>">
 									<option selected><?php esc_html_e( '- Select a sidebar -', 'eb-textdomain' ); ?></option>
-									<?php foreach ( $GLOBALS['wp_registered_sidebars'] as $sidebar ) { ?>
+									<?php
+									$sidebars = $GLOBALS['wp_registered_sidebars'];
+									foreach ( $sidebars as $sidebar ) {
+										?>
 										<option value="<?php echo esc_attr( $sidebar['id'] ); ?>" <?php selected( $args['selected'], $sidebar['id'] ); ?>>
 											<?php echo esc_attr( $sidebar['name'] ); ?>
 										</option>
@@ -749,7 +752,6 @@ if ( ! class_exists( 'EbAdminSettings' ) ) {
 						$option_value = \app\wisdmlabs\edwiserBridge\wdm_eb_edwiser_sanitize_array( ( wp_unslash( $_POST[ $option_name ][ $setting_name ] ) ) ); // WPCS: input var ok, CSRF ok, sanitization ok.
 					}
 				} else {
-
 					$option_name  = $value['id'];
 					$setting_name = '';
 					$option_value = null;

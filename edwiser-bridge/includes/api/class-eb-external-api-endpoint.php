@@ -38,7 +38,6 @@ class Eb_External_Api_Endpoint {
 	public function external_api_endpoint_def( $request_data ) {
 
 		$data = isset( $request_data['data'] ) ? sanitize_text_field( wp_unslash( $request_data['data'] ) ) : '';
-		$data = unserialize( $data );
 
 		$response_data = array();
 
@@ -47,30 +46,41 @@ class Eb_External_Api_Endpoint {
 
 			switch ( $action ) {
 				case 'test_connection':
+					$data          = unserialize( $data, array( 'token' ) );
 					$response_data = $this->eb_test_connection( $data );
 					break;
 
 				case 'course_enrollment':
+					$data          = unserialize( $data, array( 'user_id', 'course_id', 'user_name', 'first_name', 'last_name', 'email' ) );
 					$response_data = $this->eb_course_enrollment( $data, 0 );
 					break;
 
 				case 'course_un_enrollment':
+					error_log('data::'.print_r($data, 1));
+
+					$data          = unserialize( $data, array( 'user_id', 'course_id', 'user_name', 'first_name', 'last_name', 'email' ) );
+					
+					error_log('data::'.print_r($data, 1));
 					$response_data = $this->eb_course_enrollment( $data, 1 );
 					break;
 
 				case 'user_creation':
+					$data          = unserialize( $data, array( 'user_id', 'user_name', 'first_name', 'last_name', 'email', 'password', 'enc_iv' ) );
 					$response_data = $this->eb_trigger_user_creation( $data );
 					break;
 
 				case 'user_deletion':
+					$data          = unserialize( $data, array( 'user_id' ) );
 					$response_data = $this->eb_trigger_user_delete( $data );
 					break;
 
 				case 'user_updated':
+					$data          = unserialize( $data, array( 'user_id', 'first_name', 'last_name', 'email', 'country', 'city', 'phone', 'password', 'enc_iv' ) );
 					$response_data = $this->eb_trigger_user_update( $data );
 					break;
 
 				case 'course_deleted':
+					$data          = unserialize( $data, array( 'course_id' ) );
 					$response_data = $this->eb_trigger_course_delete( $data );
 					break;
 
@@ -142,7 +152,7 @@ class Eb_External_Api_Endpoint {
 					// check if there any pending enrollments for the given course then don't enroll user.
 					$user_enrollment_meta = get_user_meta( $wp_user_id, 'eb_pending_enrollment', 1 );
 
-					if ( in_array( trim( $wp_course_id ), $user_enrollment_meta, true ) ) {
+					if ( is_array( $user_enrollment_meta ) && in_array( trim( $wp_course_id ), $user_enrollment_meta, true ) ) {
 						return;
 					}
 
@@ -182,17 +192,16 @@ class Eb_External_Api_Endpoint {
 		if ( isset( $data['user_name'] ) && isset( $data['email'] ) ) {
 			$role            = \app\wisdmlabs\edwiserBridge\wdm_eb_default_registration_role();
 			$eb_access_token = \app\wisdmlabs\edwiserBridge\wdm_edwiser_bridge_plugin_get_access_token();
-			$password        = '';
+			$user_p          = '';
 			if ( isset( $data['password'] ) && ! empty( $data['password'] ) ) {
 
 				$enc_method = 'AES-128-CTR';
 				$enc_iv     = substr( hash( 'sha256', $eb_access_token ), 0, 16 );
-
-				$enc_key  = openssl_digest( $eb_access_token, 'SHA256', true );
-				$password = openssl_decrypt( $data['password'], $enc_method, $enc_key, 0, $enc_iv );
+				$enc_key    = openssl_digest( $eb_access_token, 'SHA256', true );
+				$user_p     = openssl_decrypt( $data['password'], $enc_method, $enc_key, 0, $enc_iv );
 			}
 
-			$wp_user_id = $this->create_only_wp_user( $data['user_name'], $data['email'], $data['first_name'], $data['last_name'], $role, $password );
+			$wp_user_id = $this->create_only_wp_user( $data['user_name'], $data['email'], $data['first_name'], $data['last_name'], $role, $user_p );
 			if ( $wp_user_id ) {
 				update_user_meta( $wp_user_id, 'moodle_user_id', $data['user_id'] );
 			}
@@ -235,9 +244,9 @@ class Eb_External_Api_Endpoint {
 	 * @param  text   $firstname firstname.
 	 * @param  text   $lastname  lastname.
 	 * @param  text   $role  role.
-	 * @param  string $password    password.
+	 * @param  string $user_p    password.
 	 */
-	public function create_only_wp_user( $username, $email, $firstname, $lastname, $role = '', $password = '' ) {
+	public function create_only_wp_user( $username, $email, $firstname, $lastname, $role = '', $user_p = '' ) {
 		if ( email_exists( $email ) ) {
 			return new \WP_Error(
 				'registration-error',
@@ -255,9 +264,9 @@ class Eb_External_Api_Endpoint {
 			++$append;
 		}
 
-		if ( empty( $password ) ) {
+		if ( empty( $user_p ) ) {
 			// Handle password creation.
-			$password = wp_generate_password();
+			$user_p = wp_generate_password();
 		}
 
 		// WP Validation.
@@ -276,7 +285,7 @@ class Eb_External_Api_Endpoint {
 			'eb_new_user_data',
 			array(
 				'user_login' => $username,
-				'user_pass'  => $password,
+				'user_pass'  => $user_p,
 				'user_email' => $email,
 				'role'       => $role,
 			)
@@ -304,7 +313,7 @@ class Eb_External_Api_Endpoint {
 			'username'   => $username,
 			'first_name' => $firstname,
 			'last_name'  => $lastname,
-			'password'   => $password,
+			'password'   => $user_p,
 		);
 		do_action( 'eb_created_user', $args );
 		return $user_id;
@@ -362,8 +371,8 @@ class Eb_External_Api_Endpoint {
 				$enc_iv     = substr( hash( 'sha256', $eb_access_token ), 0, 16 );
 
 				$enc_key                        = openssl_digest( $eb_access_token, 'SHA256', true );
-				$password                       = openssl_decrypt( $data['password'], $enc_method, $enc_key, 0, $enc_iv );
-				$user_update_array['user_pass'] = $password;
+				$user_p                         = openssl_decrypt( $data['password'], $enc_method, $enc_key, 0, $enc_iv );
+				$user_update_array['user_pass'] = $user_p;
 			}
 
 			$user_update_array = apply_filters( 'eb_mdl_user_update_trigger_data', $user_update_array );
